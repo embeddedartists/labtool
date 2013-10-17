@@ -1,0 +1,61 @@
+/** @defgroup EA_LABTOOL_MAIN LabTool
+ * @{
+ */
+/** @defgroup FUNCTIONALITY Functionality
+ * @{
+ */
+	/** @defgroup FUNC_CAP Signal Capturing
+	 */
+	/** @defgroup FUNC_GEN Signal Generation
+	 */
+	/** @defgroup FUNC_I2C_MON I2C Monitoring
+	 */
+	/** @defgroup FUNC_FREQ Frequency Counting
+	 */
+	/** @defgroup FUNC_STATE State Machine
+	 */
+	/** @defgroup FUNC_COMM Communication
+	 */
+/**
+ * @}
+ */
+
+/** @defgroup RESOURCES Resources
+ * @{
+ */
+	/** @defgroup RES_MEMORY Memory Usage
+	 * @brief Which memory regions are used and for what
+	 */
+	/** @defgroup RES_PART Core Partitioning
+	 * @brief What are the three cores used for
+	 */
+	/** @defgroup RES_IRQ Interrupts
+	 * @brief Which interrupts are used with which priorities and for what
+	 */
+/**
+ * @}
+ */
+ 
+/** @defgroup IP_BLOCKS IP Blocks
+ * @{
+ */
+	/** @defgroup IP_GPDMA GPDMA (General Purpose DMA)
+	 */
+	/** @defgroup IP_IPC IPC (Inter Process Communication)
+	 */
+	/** @defgroup IP_SGPIO SGPIO (Serial GPIO)
+	 */
+	/** @defgroup IP_SPI SPI (Serial Peripheral Interface)
+	 */
+	/** @defgroup IP_USB USB (Universal Serial Bus)
+	 */
+	/** @defgroup IP_VADC VADC (Video ADC)
+	 */
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+

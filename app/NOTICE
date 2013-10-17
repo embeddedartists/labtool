@@ -1,0 +1,12 @@
+LabTool
+Copyright 2013 Embedded Artists
+
+This product uses libusbx available from http://libusbx.org/
+
+The program's icon comes from 
+http://findicons.com/icon/440685/oscilloscope?id=449683
+
+The dfu-util program is used to download the firmware to the
+LabTool hardware. It is available from http://dfu-util.gnumonks.org/
+
+

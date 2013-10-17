@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StateMachine>
+<Global key="Name" value="blinky"/>
+<Global key="Header in sct_user.h" value="LPC8xx.h"/>
+<Global key="Target" value="LPC8xx"/>
+<Global key="Main output file" value="blinky.smd"/>
+<Input IMemento.internal.id="SmInput" Name="ABORT" Permissions="6" Source="CTIN_0" Type="0"/>
+<Input IMemento.internal.id="SmInput" Name="Input pin 1" Permissions="6" Source="CTIN_1" Type="0"/>
+<Input IMemento.internal.id="SmInput" Name="Input pin 2" Permissions="6" Source="CTIN_2" Type="0"/>
+<Input IMemento.internal.id="SmInput" Name="Input pin 3" Permissions="6" Source="CTIN_3" Type="0"/>
+<Input IMemento.internal.id="SmInput" Name="pwm_cycle" Permissions="0" Source="C_pwm_cycle" Type="9"/>
+<Input IMemento.internal.id="SmInput" Name="pwm_val1" Permissions="0" Source="C_pwm_val1" Type="9"/>
+<Input IMemento.internal.id="SmInput" Name="pwm_val2" Permissions="0" Source="C_pwm_val2" Type="9"/>
+<Input IMemento.internal.id="SmInput" Name="pwm_val3" Permissions="0" Source="C_pwm_val3" Type="9"/>
+<Input IMemento.internal.id="SmInput" Name="pwm_val4" Permissions="0" Source="C_pwm_val4" Type="9"/>
+<Input IMemento.internal.id="SmInput" Name="C_pwm_val1" Permissions="0" Source="400000" Type="6"/>
+<Input IMemento.internal.id="SmInput" Name="C_pwm_val2" Permissions="0" Source="500000" Type="6"/>
+<Input IMemento.internal.id="SmInput" Name="C_pwm_val3" Permissions="0" Source="100000" Type="6"/>
+<Input IMemento.internal.id="SmInput" Name="C_pwm_val4" Permissions="0" Source="900000" Type="6"/>
+<Input IMemento.internal.id="SmInput" Name="C_pwm_cycle" Permissions="0" Source="1000000" Type="6"/>
+<Output IMemento.internal.id="SmOutput" Name="PWM1" Permissions="6" Source="CTOUT_0" Type="0" preload="FALSE"/>
+<Output IMemento.internal.id="SmOutput" Name="PWM2" Permissions="6" Source="CTOUT_1" Type="0" preload="FALSE"/>
+<Output IMemento.internal.id="SmOutput" Name="PWM3" Permissions="6" Source="CTOUT_2" Type="0" preload="FALSE"/>
+<Output IMemento.internal.id="SmOutput" Name="PWM4" Permissions="6" Source="CTOUT_3" Type="0" preload="FALSE"/>
+<Output IMemento.internal.id="SmOutput" Name="Limit unified counter" Permissions="6" Source="U_LIMIT" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Start unified counter" Permissions="6" Source="U_START" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Stop unified counter" Permissions="6" Source="U_STOP" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Halt unified counter" Permissions="6" Source="U_HALT" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Limit low counter" Permissions="6" Source="L_LIMIT" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Start low counter" Permissions="6" Source="L_START" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Stop low counter" Permissions="6" Source="L_STOP" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Halt low counter" Permissions="6" Source="L_HALT" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Limit high counter" Permissions="6" Source="H_LIMIT" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Start high counter" Permissions="6" Source="H_START" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Stop high counter" Permissions="6" Source="H_STOP" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="Halt high counter" Permissions="6" Source="H_HALT" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="IRQ_cycle" Permissions="6" Source="IRQ" Type="2"/>
+<Output IMemento.internal.id="SmOutput" Name="IRQ_abort" Permissions="0" Source="IRQ" Type="2"/>
+<State h="279" name="U_ALWAYS" w="271" x="292" y="293"/>
+<Action description="" name="StartPWMx" numElements="6">
+<ActionElement name="PWM1" op="1" order="1"/>
+<ActionElement name="PWM2" op="1" order="2"/>
+<ActionElement name="Limit unified counter" op="2" order="3"/>
+<ActionElement name="IRQ_cycle" op="2" order="4"/>
+<ActionElement name="PWM3" op="1" order="5"/>
+<ActionElement name="PWM4" op="1" order="6"/>
+</Action>
+<Action description="" name="AbortPWM" numElements="7">
+<ActionElement name="PWM1" op="0" order="1"/>
+<ActionElement name="PWM2" op="0" order="2"/>
+<ActionElement name="Limit unified counter" op="2" order="3"/>
+<ActionElement name="Halt unified counter" op="2" order="4"/>
+<ActionElement name="IRQ_abort" op="2" order="5"/>
+<ActionElement name="PWM3" op="0" order="6"/>
+<ActionElement name="PWM4" op="0" order="7"/>
+</Action>
+<Action description="" name="action 1" numElements="1">
+<ActionElement name="PWM1" op="0" order="1"/>
+</Action>
+<Action description="" name="action 2" numElements="1">
+<ActionElement name="PWM2" op="0" order="1"/>
+</Action>
+<Action description="" name="action 3" numElements="1">
+<ActionElement name="PWM3" op="0" order="1"/>
+</Action>
+<Action description="" name="action 4" numElements="1">
+<ActionElement name="PWM4" op="0" order="1"/>
+</Action>
+<SmLogical IMemento.internal.id="SmSignal" SML_DESC="" SML_NAME="signal_cycle">
+<SmLogical IMemento.internal.id="SmLogicalBool" IOTYPE="0" SML_NAME="pwm_cycle" SML_TYPE="1"/>
+</SmLogical>
+<SmLogical IMemento.internal.id="SmSignal" SML_DESC="" SML_NAME="signal_pwm1">
+<SmLogical IMemento.internal.id="SmLogicalBool" IOTYPE="0" SML_NAME="pwm_val1" SML_TYPE="1"/>
+</SmLogical>
+<SmLogical IMemento.internal.id="SmSignal" SML_DESC="" SML_NAME="signal_pwm2">
+<SmLogical IMemento.internal.id="SmLogicalBool" IOTYPE="0" SML_NAME="pwm_val2" SML_TYPE="1"/>
+</SmLogical>
+<SmLogical IMemento.internal.id="SmSignal" SML_DESC="" SML_NAME="signal_pwm3">
+<SmLogical IMemento.internal.id="SmLogicalBool" IOTYPE="0" SML_NAME="pwm_val3" SML_TYPE="1"/>
+</SmLogical>
+<SmLogical IMemento.internal.id="SmSignal" SML_DESC="" SML_NAME="signal_pwm4">
+<SmLogical IMemento.internal.id="SmLogicalBool" IOTYPE="0" SML_NAME="pwm_val4" SML_TYPE="1"/>
+</SmLogical>
+<SmLogical IMemento.internal.id="SmSignal" SML_DESC="" SML_NAME="signal_abort">
+<SmLogical IMemento.internal.id="SmLogicalBool" IOTYPE="0" SML_NAME="ABORT" SML_TYPE="0"/>
+</SmLogical>
+<Transition action="StartPWMx" current="U_ALWAYS" h="120" next="U_ALWAYS" priority="0" signal="signal_cycle" w="150" x="383" y="77">
+<curve num="1">
+<point d1x="4" d1y="-229" d2x="4" d2y="-229" index="0" weight="0.5"/>
+</curve>
+</Transition>
+<Transition action="AbortPWM" current="U_ALWAYS" h="135" next="U_ALWAYS" priority="0" signal="signal_abort" w="150" x="84" y="246">
+<curve num="1">
+<point d1x="-184" d1y="-129" d2x="-184" d2y="-129" index="0" weight="0.5"/>
+</curve>
+</Transition>
+<Transition action="action 2" current="U_ALWAYS" h="45" next="U_ALWAYS" priority="0" signal="signal_pwm2" w="78" x="627" y="378">
+<curve num="2">
+<point d1x="163" d1y="-16" d2x="163" d2y="-16" index="0" weight="0.5"/>
+<point d1x="180" d1y="-41" d2x="180" d2y="-41" index="1" weight="0.5"/>
+</curve>
+</Transition>
+<Transition action="action 3" current="U_ALWAYS" h="45" next="U_ALWAYS" priority="0" signal="signal_pwm3" w="63" x="632" y="446">
+<curve num="2">
+<point d1x="176" d1y="16" d2x="176" d2y="16" index="0" weight="0.5"/>
+<point d1x="182" d1y="39" d2x="182" d2y="39" index="1" weight="0.5"/>
+</curve>
+</Transition>
+<Transition action="action 4" current="U_ALWAYS" h="45" next="U_ALWAYS" priority="0" signal="signal_pwm4" w="63" x="633" y="515">
+<curve num="2">
+<point d1x="161" d1y="64" d2x="161" d2y="64" index="0" weight="0.5"/>
+<point d1x="178" d1y="97" d2x="178" d2y="97" index="1" weight="0.5"/>
+</curve>
+</Transition>
+<Transition action="action 1" current="U_ALWAYS" h="45" next="U_ALWAYS" priority="0" signal="signal_pwm1" w="78" x="627" y="293">
+<curve num="2">
+<point d1x="171" d1y="-114" d2x="171" d2y="-114" index="0" weight="0.5"/>
+<point d1x="165" d1y="-140" d2x="165" d2y="-140" index="1" weight="0.5"/>
+</curve>
+</Transition>
+<SmSpecification IMemento.internal.id="SmSCTv1" isUnified="true"/>
+</StateMachine>

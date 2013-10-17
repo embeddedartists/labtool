@@ -1,0 +1,64 @@
+/*!
+\page install Installation
+
+This chapter describes the steps needed to prepare the hardware and install the 
+PC application.
+
+\section install_prepare_hw Prepare Hardware
+
+The following things are needed before starting (one of each):
+
+- LPC-Link 2, rev C board
+- LabTool for LPC-Link 2 board, rev PA1, with cable for connecting signals
+- Jumper, 100 mil pitch
+- USB cable (mini-B to A)
+
+![LPC-Link 2 Board and LabTool Hardware] (lpclink2_labtool_1.png)
+
+Insert a jumper in JP2 on the LPC-Link 2 board, see picture 
+[LPC-Link 2 Board and LabTool Hardware] (lpclink2_labtool_1.png) above.
+
+Place the two boards according to the figure above. Place the LabTool board on 
+top of the LPC-Link 2 board and mount it on the LPC-Link 2 board, without 
+turning any of the boards. It is possible to mount the two boards slightly 
+misaligned so make sure the upper and left sides of the two boards are 
+perfectly aligned between the boards.
+
+When the LabTool board has been mounted on the LPC-Link 2 board it will look like 
+on [figure below](labtool_mount_lpclink2.png) from the side. Do not press the boards 
+together at the board edges. There is a risk for damaging the board-to-board connectors 
+then. Just press the boards together over the connectors.
+
+![LabTool board mounted on top of LPC-Link 2 board] (labtool_mount_lpclink2.png)
+
+
+\section install_pc_app Install the LabTool PC Application
+
+Run the file **Setup.exe** to install the software on the PC.
+
+![First Dialog of Setup.exe] (setup_1.png)
+
+Press the **Next** button.
+
+![Second Dialog of Setup.exe] (setup_2.png)
+
+Select destination folder and press **Next** button. If possible, keep default 
+folder.
+
+![Third Dialog of Setup.exe] (setup_3.png)
+
+Select checkbox to get a desktop icon of the application. Press **Next** button.
+
+![Fourth Dialog of Setup.exe] (setup_4.png)
+
+Press **Install** button and wait while files are installed on the computer. 
+After a short while, the final dialog will be displayed, as illustrated below.
+
+![Fifth Dialog of Setup.exe] (setup_5.png)
+
+Press **Finish** button to complete the installation.
+
+\section install_sources Install USB Driver
+
+Todo describe how to build and install from sources.
+*/

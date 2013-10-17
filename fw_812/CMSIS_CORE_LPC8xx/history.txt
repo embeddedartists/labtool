@@ -1,0 +1,9 @@
+History of updates to CMSIS_CORE_LPC8xx
+=======================================
+
+7 November 2012
+---------------
+CMSIS library project using ARM Cortex-M0+ CMSIS files as
+supplied in ARM's CMSIS 3.01 March 2012 release, together
+with device specific files.
+

@@ -1,0 +1,41 @@
+/*!
+    \defgroup main Main
+    \brief Contains the main class (entry point) for the applicaiton.
+*/
+
+/*!
+    \defgroup Device Device    
+    \brief Classes related to capture and generator devices.
+    
+    \section dev1 Testing section of device
+    
+    Hepp hoppsan sa
+    
+    \subsection dev1_1 Testing subsection of device
+    
+    Hej igen
+    
+    \subsubsection dev1_1_1 Testing subsubsection of device
+    
+    Hejdå
+*/
+
+/*!
+    \defgroup Capture Capture
+    \brief Classes related to the capture functionality.
+*/
+
+/*!
+    \defgroup Generator Generator
+    \brief Classes related to the generator functionality.
+*/
+
+/*!
+    \defgroup Analyzer Analyzer
+    \brief Classes related to protocol analyzers.
+*/
+
+/*!
+    \defgroup Common Common
+    \brief Classes that are common for all parts of the application.
+*/

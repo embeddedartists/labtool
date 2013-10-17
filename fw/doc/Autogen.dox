@@ -1,0 +1,29 @@
+/*!
+ * \file freq_measure.inc
+ * \brief Parameterization of generated SCT code
+ */
+ 
+/*!
+ * \file sct_fsm.h
+ * \brief Generated SCT header file
+ */
+ 
+/*!
+ * \file sct_fsm.c
+ * \brief Generated SCT code
+ */
+
+/*!
+ * \dir Lib_Drivers
+ * \brief Drivers for LabTool
+ */
+
+/*!
+ * \dir program
+ * \brief LabTool Firmware
+ */
+
+/*!
+ * \dir program/sct
+ * \brief Helper files for \ref TEST_SCT_FREQUENCY_COUNTER
+ */

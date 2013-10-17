@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/8_close.png</file>
+        <file>resources/16_minus.png</file>
+        <file>resources/16_plus.png</file>
+        <file>resources/16_recurring.png</file>
+        <file>resources/16_start.png</file>
+        <file>resources/16_stop.png</file>
+        <file>resources/16_zoom_all.png</file>
+        <file>resources/16_zoom_in.png</file>
+        <file>resources/16_zoom_out.png</file>
+        <file>resources/8_configure.png</file>
+        <file>resources/16_tile.png</file>
+        <file>resources/16_analog.png</file>
+        <file>resources/16_digital.png</file>
+        <file>resources/oscilloscope.ico</file>
+    </qresource>
+</RCC>

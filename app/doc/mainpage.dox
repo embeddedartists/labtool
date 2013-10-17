@@ -1,0 +1,28 @@
+/*! 
+\mainpage 
+
+<h2>Introduction</h2>
+TODO
+
+\n
+This manual is divided into X parts, each of which is divided into several sections.
+
+The first part forms a user manual:
+<ul>
+<li>Section \ref install discusses how to 
+      <a href="http://www.doxygen.org/download.html">download</a>, compile and install
+                     doxygen for your platform.
+
+</ul>
+
+The second part forms a reference manual:
+
+<ul>
+<li>TODO.
+
+</ul>
+
+
+
+*/
+ 
