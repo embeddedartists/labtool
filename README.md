@@ -3,9 +3,9 @@ LabTool Software
 
 This repository hold the software for the [LabTool][1] hardware and consist of three parts:
 
-1. The LabTool [User Interface][app] - a program written in Qt that is executed on a PC.
-2. The LabTool [Firmware][fw] - a program that executes on the onboard LPC4370
-3. The LabTool [Demo][fw_812] - a program that executes on the onboard LPC812
+1. The LabTool [User Interface](app) - a program written in Qt that is executed on a PC.
+2. The LabTool [Firmware](fw) - a program that executes on the onboard LPC4370
+3. The LabTool [Demo](fw_812) - a program that executes on the onboard LPC812
 
 Documentation
 -------------
