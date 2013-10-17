@@ -14,8 +14,12 @@ The User's Manual and information about LabTool is found on the [product page][1
 The code documentation can be generated with doxygen for each of the three parts.
 
 Installation
------------
+------------
 Download and run the installer [here][1]. It will install the LabTool User Interface and the needed drivers in Windows.
+
+Compiling
+---------
+If you would like to compile LabTool yourself, follow the instructions for that part - [User Interface](app/COMPILE.md), [Firmware](fw/COMPILE.md) or [Demo](fw_812/COMPILE.md).
 
 Suggested Improvements
 ----------------------
