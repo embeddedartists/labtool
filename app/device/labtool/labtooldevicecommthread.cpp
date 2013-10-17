@@ -199,7 +199,11 @@ void LabToolDeviceCommThread::runDFU()
 #ifdef Q_OS_WIN
     QString program = "tools/dfu-util-0.7-binaries/win32-mingw32/dfu-util-static.exe";
 #else // Q_OS_LINUX
+  #ifdef QT_ARCH_ARM
+    QString program = "tools/dfu-util-0.7-binaries/linux-armel/dfu-util";
+  #else
     QString program = "tools/dfu-util-0.7-binaries/linux-i386/dfu-util";
+  #endif
 #endif
     if (!QFile::exists(program))
     {
