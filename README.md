@@ -13,13 +13,40 @@ The User's Manual and information about LabTool is found on the [product page][1
 
 The code documentation can be generated with doxygen for each of the three parts.
 
-Installation
-------------
-Download and run the installer [here][1]. It will install the LabTool User Interface and the needed drivers in Windows.
+Installation - Windows
+----------------------
+For Windows there is an installer which can be downloaded [here][1]. It will install the LabTool User Interface and the needed drivers.
 
-Compiling
----------
+Installation - Raspberry Pi
+---------------------------
+For Raspberry Pi there are prebuilt binaries. The prerequisites are:
+* A Raspberry Pi model B (needed for the extra 256MBytes RAM)
+* A powered USB hub to be able to connect LabTool, a mouse and optionally a keyboard
+
+If you don't have Raspbian Wheezy running already, you can download `2013-09-25-wheezy-raspbian.zip` [here][4] and write it to an SD card using one of the methods described [here][3].
+
+After booting into Raspbian open an LXTerminal and type in these commands:
+
+    $ cd ~/Desktop
+    $ wget http://www.embeddedartists.com/sites/default/files/support/app/labtool/labtool_raspi_2013-10-18.tgz
+    $ tar -xf labtool_raspi_2013-10-18.tgz
+    $ cd LabTool
+    $ sudo cp 10-ea-labtool.rules /etc/udev/rules.d/
+    $ cp LabTool.desktop ~/Desktop/
+
+Note that the exact name of the archive `labtool_raspi_2013-10-18.tgz` will change over time and the latest version is always available on the [product page][1].
+
+After installing you will have an icon on the desktop to start LabTool with.
+
+Compiling in Windows
+--------------------
 If you would like to compile LabTool yourself, follow the instructions for that part - [User Interface](app/COMPILE.md), [Firmware](fw/COMPILE.md) or [Demo](fw_812/COMPILE.md).
+
+Compiling in Linux
+------------------
+Raspberry Pi is used as a reference system for Linux compilation. The instructions for building the LabTool User Interface on a Raspberry Pi are available [here](app/COMPILE.raspi.md).
+
+If you use a different Linux distribution and/or hardware the Raspberry Pi instructions can give you a starting point.
 
 Suggested Improvements
 ----------------------
@@ -39,3 +66,7 @@ Contributing
 
 [1]: http://www.embeddedartists.com/products/app/labtool.php
 [2]: http://github.com/embeddedartists/LabTool/pulls
+[3]: http://www.raspberrypi.org
+[4]: http://www.raspberrypi.org/downloads
+[5]: http://www.raspbian.org/
+
