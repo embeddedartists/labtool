@@ -86,7 +86,7 @@ Running/Debugging
 -----------------
 Running and/or debugging the LabTool Application is easiest done from inside Qt Creator.
 
-Note that LabTool expects the firmware for the LabTool hardware. That can either be compiled (see instructions in the [LabTool Firmware (fw)](../fw/COMPILE.md) or be extracted from the [installation program][1].
+Note that LabTool expects the firmware for the LabTool hardware. That can either be compiled (see instructions in the [LabTool Firmware](../fw/COMPILE.md)) or extracted from the [archive with binaries][1].
 
 Store the `firmware.bin` file in `/home/pi/projects/labtool/fw/program/uVision/Internal_SRAM/` folder (create it if it doesn't exist). The reason for putting the firware.bin file there is that both the Debug and Release versions look for the file there.
 
