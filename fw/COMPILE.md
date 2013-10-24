@@ -1,6 +1,6 @@
 Compiling LabTool Firmware
 ==========================
-The LabTool Firware is for the LPC4370 on the LPC-Link2 board. It is only available with a SRAM version (no FLASH) so that the LabTool application can always load the latest version in runtime.
+The LabTool Firmware is for the LPC4370 on the LPC-Link2 board. It is only available with a SRAM version (no FLASH) so that the LabTool application can always load the latest version in runtime.
 
 Requirements
 ------------
