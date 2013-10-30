@@ -78,7 +78,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
   {
     .Header                 = {.Size = sizeof(USB_Descriptor_Configuration_Header_t), .Type = DTYPE_Configuration},
 
-    .TotalConfigurationSize = sizeof(USB_Descriptor_Configuration_t), // v0.97 used sizeof(...)-1
+    .TotalConfigurationSize = sizeof(USB_Descriptor_Configuration_t) - 1, /* B.VERNOUX Last byte LabTool_Termination shall be not sent remove 1, v0.97 used sizeof(...)-1 */
     .TotalInterfaces        = 1,
 
     .ConfigurationNumber    = 1,
@@ -208,7 +208,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
       break;
     case DTYPE_Configuration:
       Address = &ConfigurationDescriptor;
-      Size    = sizeof(USB_Descriptor_Configuration_t);
+      Size    = sizeof(USB_Descriptor_Configuration_t) - 1; /* B.VERNOUX Last byte LabTool_Termination shall be not sent */
       break;
     case DTYPE_String:
       switch (DescriptorNumber)
