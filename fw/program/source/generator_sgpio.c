@@ -391,11 +391,15 @@ static cmd_status_t gen_sgpio_PrepareContinuousData(gen_sgpio_cfg_t* cfg)
         {
           TMP_SRC_MEM[i] = cfg->patterns[i][config[slice].dio];
         }
+#if defined(__GNUC__)
+		// TODO: Need to implement this without using _membitcpywl
+#else		
         // repetedly copy the states into a long sequence
         for (i = 0; i < mult; i++)
         {
           _membitcpywl(TMP_DEST_MEM, TMP_SRC_MEM, i * cfg->numStates, 0, cfg->numStates);
         }
+#endif		
         // move into the DMA buffers
         for (i = 0; i < numDmaBuffers; i++)
         {

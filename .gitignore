@@ -9,3 +9,11 @@ LabTool-build-desktop-Qt_4_8_1_for_Desktop_-_MinGW__Qt_SDK__Release/
 fw/program/uVision/Internal_SRAM/
 fw/program/uVision/*.dep
 fw/program/uVision/firmware.uvgui.*
+
+# ARM GCC output
+*.o
+fw/*.bin
+fw/*.elf
+
+# Misc unwanted files
+*.bak

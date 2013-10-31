@@ -78,6 +78,12 @@ void SystemInit (void)
 	extern void *__Vectors;
 
 	org = *pSCB_VTOR = (unsigned int)&__Vectors;
+	
+#elif defined(__GNUC__)
+	extern void *__isr_vector;
+
+	org = *pSCB_VTOR = (unsigned int)&__isr_vector;
+
 #else
 #error Unknown compiler
 #endif
