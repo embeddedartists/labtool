@@ -17,7 +17,6 @@ OBJCOPY = $(GCC_BIN)arm-none-eabi-objcopy
 
 CPU = -mcpu=cortex-m4 -mthumb
 CC_FLAGS = $(CPU) -c -Os -fno-common -fmessage-length=0 -Wall -fno-exceptions -ffunction-sections -fdata-sections 
-#CC_SYMBOLS = -DTARGET_LPC4088 -DTARGET_M4 -DTARGET_NXP -DTARGET_LPC408X -DTOOLCHAIN_GCC_ARM -DTOOLCHAIN_GCC -D__CORTEX_M4 -DARM_MATH_CM4 -D__FPU_PRESENT=1 
 CC_SYMBOLS = -DCORE_M4 -DUSE_SPIFI_LIB -D__LPC43XX__ -DUSB_DEVICE_ONLY
 
 LD_FLAGS = -mcpu=cortex-m4 -mthumb -Wl,--gc-sections --specs=nano.specs -u _printf_float -u _scanf_float
