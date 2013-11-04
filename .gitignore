@@ -15,9 +15,13 @@ fw/program/uVision/firmware.uvgui.*
 fw/*.bin
 fw/*.elf
 
-# LPCXpresso Build directories
+# LPCXpresso output
 fw/Debug/
 fw/Release/
+fw/*.launch
+
+# LabTool runtime output
+fw/firmware.bin.qthdr
 
 # Misc unwanted files
 *.bak
