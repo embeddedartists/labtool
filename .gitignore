@@ -1,9 +1,9 @@
 # QtCreator localized project file
 LabTool.pro.user
 
-# QtCreator output
-LabTool-build-desktop-Qt_4_8_1_for_Desktop_-_MinGW__Qt_SDK__Debug/
-LabTool-build-desktop-Qt_4_8_1_for_Desktop_-_MinGW__Qt_SDK__Release/
+# Qt Shadow Build directories (different for Qt4 and Qt5)
+LabTool-build-desktop-Qt_4_*
+build-LabTool-Desktop_Qt_5_*
 
 # uVision output
 fw/program/uVision/Internal_SRAM/
@@ -14,6 +14,10 @@ fw/program/uVision/firmware.uvgui.*
 *.o
 fw/*.bin
 fw/*.elf
+
+# LPCXpresso Build directories
+fw/Debug/
+fw/Release/
 
 # Misc unwanted files
 *.bak
