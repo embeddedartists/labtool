@@ -32,7 +32,7 @@
 #include "LPC18xx.h"
 #endif
 #if defined(__LPC43XX__)
-#include "LPC43xx.h"
+#include "lpc43xx.h"
 #endif
 #include "lpc_types.h"
 

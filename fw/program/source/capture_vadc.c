@@ -26,7 +26,7 @@
  * Includes
  *****************************************************************************/
 
-#include "LPC43xx.h"
+#include "lpc43xx.h"
 
 #include "lpc43xx_scu.h"
 #include "lpc43xx_cgu_improved.h"
