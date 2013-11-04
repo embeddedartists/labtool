@@ -136,7 +136,7 @@ void LabToolDeviceCommThread::reconnectToTarget()
 */
 void LabToolDeviceCommThread::prepareDfuImage()
 {
-    QString fName = "../fw/program/uVision/Internal_SRAM/firmware.bin";
+    QString fName = "../fw/firmware.bin";
 
     if (!QFile::exists(fName)) {
         fName = "firmware.bin";
