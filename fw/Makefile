@@ -1,4 +1,4 @@
-
+GCC_BIN =
 PROJECT = firmware
 USB_OBJS = ./Lib_USB/LPCUSBLib/Drivers/USB/Core/DeviceStandardReq.o \
            ./Lib_USB/LPCUSBLib/Drivers/USB/Core/Events.o \
@@ -40,7 +40,7 @@ ifdef SystemRoot
    RMOBJS = $(subst /,\,$(OBJECTS))
 else
    ifeq ($(shell uname), Linux)
-      RM     = fm -f
+      RM     = rm -f
       RMOBJS = $(OBJECTS)
    endif
 endif
