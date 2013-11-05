@@ -13,10 +13,26 @@ USB_OBJS = ./Lib_USB/LPCUSBLib/Drivers/USB/Core/DeviceStandardReq.o \
            ./Lib_USB/LPCUSBLib/Drivers/USB/Core/LPC/HAL/LPC18XX/HAL_LPC18xx.o \
            ./Lib_USB/LPCUSBLib/Drivers/USB/Core/LPC/DCD/LPC18XX/Endpoint_LPC18xx.o \
            ./Lib_USB/bsp.o
+PRG_OBJS = ./program/source/calibrate.o \
+           ./program/source/capture.o \
+           ./program/source/capture_sgpio.o \
+           ./program/source/capture_vadc.o \
+           ./program/source/circbuff.o \
+           ./program/source/experiments.o \
+           ./program/source/generator.o \
+           ./program/source/generator_dac.o \
+           ./program/source/generator_sgpio.o \
+           ./program/source/log.o \
+           ./program/source/main.o \
+           ./program/source/monitor_i2c.o \
+           ./program/source/sgpio_cfg.o \
+           ./program/source/statemachine.o \
+           ./program/source/usb_descriptors.o \
+           ./program/source/usb_handler.o
 OBJECTS = $(patsubst %c,%o,$(wildcard ./Lib_Drivers/source/*.c)) \
           $(patsubst %c,%o,$(wildcard ./Lib_MCU/source/*.c)) \
           $(patsubst %c,%o,$(wildcard ./program/sct/*.c)) \
-          $(patsubst %c,%o,$(wildcard ./program/source/*.c)) \
+          $(PRG_OBJS) \
           $(USB_OBJS) \
           ./program/source/startup_ARMCM4.o
 
