@@ -13,6 +13,15 @@ The User's Manual and information about LabTool is found on the [product page][1
 
 The code documentation can be generated with doxygen for each of the three parts.
 
+Mailing List
+------------
+There is a mailing list [here](https://groups.google.com/d/forum/labtool) where issues and questions about LabTool can be discussed.
+
+Typical topics are:
+* Installation related problems
+* Suggested improvements
+* Bugs and problems with the code
+
 Installation - Windows
 ----------------------
 For Windows there is an installer which can be downloaded [here][1]. It will install the LabTool User Interface and the needed drivers.
