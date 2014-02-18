@@ -43,6 +43,8 @@
 	#define __BSS(x)
 #elif defined(__ICCARM__)
 	#define __BSS(x)
+#elif defined(__GNUC__)
+	#define __DATA(x)
 #endif
 /* Chip Includes: */
 #if defined(__LPC18XX__)||defined(__LPC43XX__)

@@ -25,7 +25,7 @@
  * Includes
  *****************************************************************************/
 
-#include "LPC43xx.h"
+#include "lpc43xx.h"
 
 #include "lpc43xx_cgu.h"
 #include "log.h"

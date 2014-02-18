@@ -24,6 +24,10 @@
  * Includes
  *****************************************************************************/
 
+#ifdef __CODE_RED
+#include <cr_section_macros.h>
+#endif
+
 #include "lpc_types.h"
 #include "lpc43xx_adc.h"
 #include "lpc43xx_cgu_improved.h"
@@ -90,6 +94,23 @@ void SysTick_Handler(void)
 {
   mstick++;
 }
+
+#ifdef DEBUG
+/**************************************************************************//**
+ *
+ * @brief   Called from drivers with parameter errors
+ *
+ *****************************************************************************/
+void check_failed(uint8_t *file, uint32_t line)
+{
+#if (ENABLE_LOGGING == OPT_ENABLED)
+  log_i("check_failed at %s:%d\r\n", file, line);
+#else
+  (void)file;
+  (void)line;
+#endif
+}
+#endif
 
 /******************************************************************************
  * Local Functions

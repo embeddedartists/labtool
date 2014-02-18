@@ -130,7 +130,7 @@ cmd_status_t cap_vadc_Configure(circbuff_t* buff, cap_vadc_cfg_t* cfg, uint32_t 
 cmd_status_t cap_vadc_PrepareToArm(void);
 void cap_vadc_Arm(void);
 cmd_status_t cap_vadc_Disarm(void);
-void inline cap_vadc_Triggered(void);
+void cap_vadc_Triggered(void);
 
 uint32_t cap_vadc_GetMilliVoltsPerDiv(int ch);
 

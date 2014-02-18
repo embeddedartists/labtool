@@ -120,7 +120,7 @@ cmd_status_t cap_sgpio_Configure(circbuff_t* buff, cap_sgpio_cfg_t* cfg, uint32_
 cmd_status_t cap_sgpio_PrepareToArm(void);
 void cap_sgpio_Arm(void);
 cmd_status_t cap_sgpio_Disarm(void);
-void inline cap_sgpio_Triggered(void);
+void cap_sgpio_Triggered(void);
 
 #endif /* end __CAPTURE_SGPIO_H */
 

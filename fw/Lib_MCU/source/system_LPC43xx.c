@@ -30,7 +30,15 @@
 **********************************************************************/
 
 #include "lpc43xx.h"
+
+#if !defined(__CODE_RED)
 #include "fpu_enable.h"
+#endif
+
+// CodeRed - call clock init code by default
+#ifdef __CODE_RED
+#include "lpc43xx_cgu.h"
+#endif
 
 /*----------------------------------------------------------------------------
   Define clocks
@@ -57,8 +65,10 @@ void SystemInit (void)
 {
     uint32_t org;
 
+#if !defined(__CODE_RED)
 #if defined(CORE_M4) && defined(USE_FPU)
         fpuEnable();
+#endif
 #endif
         
 #if !defined(CORE_M0)
@@ -73,11 +83,19 @@ void SystemInit (void)
 #elif defined(__CODE_RED)
 	extern void *g_pfnVectors;
 
-	org = *pSCB_VTOR = (unsigned int)g_pfnVectors;
+	// CodeRed - correct to assign address of variable not contents
+	// org = *pSCB_VTOR = (unsigned int)g_pfnVectors;
+	org = *pSCB_VTOR = (unsigned int)&g_pfnVectors;
 #elif defined(__ARMCC_VERSION)
 	extern void *__Vectors;
 
 	org = *pSCB_VTOR = (unsigned int)&__Vectors;
+	
+#elif defined(__GNUC__)
+	extern void *__isr_vector;
+
+	org = *pSCB_VTOR = (unsigned int)&__isr_vector;
+
 #else
 #error Unknown compiler
 #endif
@@ -97,6 +115,12 @@ void SystemInit (void)
     /*Enable Buffer for External Flash*/
     LPC_EMC->STATICCONFIG0 |= 1<<19;
 }
+
+// CodeRed - call clock init code by default
+#ifdef __CODE_RED
+    // Call clock initialisation code
+    CGU_Init();
+#endif
 
 // In case we are running from internal flash, we configure the flash
 // accelerator. This is a conservative value that should work up to 204

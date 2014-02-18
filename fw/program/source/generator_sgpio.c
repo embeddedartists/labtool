@@ -26,7 +26,7 @@
  * Includes
  *****************************************************************************/
 
-#include "LPC43xx.h"
+#include "lpc43xx.h"
 
 #include "lpc43xx_scu.h"
 #include "lpc43xx_cgu.h"
@@ -321,6 +321,28 @@ static void gen_sgpio_Setup(sgpio_channel_config_t* pConfig)
   gen_sgpio_SetupDMA();
 }
 
+/* KEIL uVision have a _membitcpywl() function that will copy numbits of bits from pSrc to
+   pDest, each with bit offsets of srcoff and destoff respectively.
+
+   That function is not available in GNU ARM GCC or LPCXpresso so this, less effective,
+   implementation is used insted. The code is only used during setup so it is not time
+   critical.
+*/
+#if defined(__CC_ARM)
+  #define gen_sgpio_copybits  _membitcpywl
+#else
+static void gen_sgpio_copybits(uint32_t* pDest, uint32_t* pSrc, uint32_t destoff, uint32_t srcoff, uint32_t numbits)
+{
+  uint32_t i;
+#define GET_BIT_X(__data, __x)  ((((__data)[(__x)/32]) >> ((__x) % 32)) & 1)
+  for (i = 0; i < numbits; i++)
+  {
+    pDest[(destoff + i)/32] |= (GET_BIT_X(pSrc, srcoff+i) << ((destoff + i) % 32));
+  }
+#undef GET_BIT_X
+}
+#endif
+
 static cmd_status_t gen_sgpio_PrepareContinuousData(gen_sgpio_cfg_t* cfg)
 {
   int slice, i;
@@ -391,11 +413,13 @@ static cmd_status_t gen_sgpio_PrepareContinuousData(gen_sgpio_cfg_t* cfg)
         {
           TMP_SRC_MEM[i] = cfg->patterns[i][config[slice].dio];
         }
+
         // repetedly copy the states into a long sequence
         for (i = 0; i < mult; i++)
         {
-          _membitcpywl(TMP_DEST_MEM, TMP_SRC_MEM, i * cfg->numStates, 0, cfg->numStates);
+          gen_sgpio_copybits(TMP_DEST_MEM, TMP_SRC_MEM, i * cfg->numStates, 0, cfg->numStates);
         }
+
         // move into the DMA buffers
         for (i = 0; i < numDmaBuffers; i++)
         {
