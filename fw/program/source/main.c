@@ -320,24 +320,24 @@ static void priorityConfig()
   */
 
   // Highest - Interprocess (to stop ongoing tasks, rarely occurs)
-  //NVIC_SetPriority(M0CORE_IRQn,    ((0x00<<3)|0x01));
-  //NVIC_SetPriority(M0_M4CORE_IRQn, ((0x00<<3)|0x01));
+  //NVIC_SetPriority(M0CORE_IRQn,    0x00);
+  //NVIC_SetPriority(M0_M4CORE_IRQn, 0x00);
 
   // High - Copying of samples
-  NVIC_SetPriority(VADC_IRQn,       ((0x01<<3)|0x01));
-  NVIC_SetPriority(SGPIO_IINT_IRQn, ((0x01<<3)|0x01));
-  NVIC_SetPriority(TIMER1_IRQn,     ((0x01<<3)|0x01));
-  NVIC_SetPriority(TIMER3_IRQn,     ((0x01<<3)|0x01));
+  NVIC_SetPriority(VADC_IRQn,        0x01);
+  NVIC_SetPriority(SGPIO_IINT_IRQn,  0x01);
+  NVIC_SetPriority(TIMER1_IRQn,      0x01);
+  NVIC_SetPriority(TIMER3_IRQn,      0x01);
 
   // Standard - Trigger handling
-  NVIC_SetPriority(DMA_IRQn,   ((0x02<<3)|0x01));
-  NVIC_SetPriority(GINT0_IRQn, ((0x02<<3)|0x01));
-  NVIC_SetPriority(SCT_IRQn,   ((0x02<<3)|0x01));
+  NVIC_SetPriority(DMA_IRQn,         0x02);
+  NVIC_SetPriority(GINT0_IRQn,       0x02);
+  NVIC_SetPriority(SCT_IRQn,         0x02);
 
   // Low - Communication
-  NVIC_SetPriority(USB0_IRQn, ((0x03<<3)|0x01));
-  NVIC_SetPriority(USB1_IRQn, ((0x03<<3)|0x01));
-  NVIC_SetPriority(I2C0_IRQn, ((0x03<<3)|0x01));
+  NVIC_SetPriority(USB0_IRQn,        0x03);
+  NVIC_SetPriority(USB1_IRQn,        0x03);
+  NVIC_SetPriority(I2C0_IRQn,        0x03);
 }
 
 /**************************************************************************//**

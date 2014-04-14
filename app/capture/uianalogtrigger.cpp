@@ -99,7 +99,7 @@ double UiAnalogTrigger::level()
 */
 void UiAnalogTrigger::setLevel(double level)
 {
-    mLevel->setValue((int)level*mScale);
+    mLevel->setValue(qRound(level*mScale));
 }
 
 /*!
@@ -110,7 +110,7 @@ void UiAnalogTrigger::setVPerDiv(double vPerDiv)
 {
     double l = level();
     mScale = TRIGGER_RANGE / (vPerDiv * 5); // 5 positive and 5 negative dividers
-    mLevel->setValue(l*mScale);
+    mLevel->setValue(qRound(l*mScale));
 }
 
 /*!

@@ -447,7 +447,7 @@ int LabToolCaptureDevice::locateAnalogHighLowTransition(QVector<double> *s, doub
 
     if (highLevel != lowLevel) {
 
-//        qDebug("dlocateAnalogHighLowTransition(trigLevel %f, offset %d", trigLevel, offset);
+//        qDebug("dlocateAnalogHighLowTransition(lowLevel %f, highLevel %f, offset %d", lowLevel, highLevel, offset);
 //        qDebug("lowLevel %f, highLevel %f, looking for High->Low", lowLevel, highLevel);
 
         for (int i = (offset < 0 ? 0 : offset); i < numSamples; i++) {
@@ -522,7 +522,7 @@ int LabToolCaptureDevice::locatePreviousAnalogHighLowTransition(QVector<double> 
 
     if (highLevel != lowLevel) {
 
-//        qDebug("dlocatePreviousAnalogHighLowTransition(trigLevel %f, offset %d", trigLevel, offset);
+//        qDebug("dlocatePreviousAnalogHighLowTransition(lowLevel %f, highLevel %f, offset %d", lowLevel, highLevel, offset);
 //        qDebug("lowLevel %f, highLevel %f, looking for High->Low", lowLevel, highLevel);
 
         for (int i = (offset >= numSamples ? numSamples-1 : offset); i >= 0; i--) {
@@ -1229,11 +1229,11 @@ void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size,
             bool forceNoiseFilter = true; // have to apply some filtering
 
             if (forceNoiseFilter) {
-                lowLevel = trigLevel - b * (1<<5);
-                highLevel = trigLevel + b * (1<<5);
+                lowLevel = trigLevel - qAbs(b * (1<<5));
+                highLevel = trigLevel + qAbs(b * (1<<5));
             } else if (mTriggerConfig->isNoiseFilterEnabled()) {
-                lowLevel = trigLevel - b * mTriggerConfig->noiseFilter12BitLevel();
-                highLevel = trigLevel + b * mTriggerConfig->noiseFilter12BitLevel();
+                lowLevel = trigLevel - qAbs(b * mTriggerConfig->noiseFilter12BitLevel());
+                highLevel = trigLevel + qAbs(b * mTriggerConfig->noiseFilter12BitLevel());
             }
 
             int pos;

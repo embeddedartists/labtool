@@ -61,6 +61,12 @@ QString StringUtil::timeInSecToString(double time)
             time*=1000;
         }
 
+        // n > 4 (i.e. time < 1ps) occurs due to double rounding issues
+        if (n > 4) {
+            time = 0;
+            n = 0;
+        }
+
         text.append(QString("%1").arg(neg*time));
         switch (n) {
         case 0:

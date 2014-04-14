@@ -60,7 +60,7 @@
  * Global Variables
  *****************************************************************************/
 
-/*! Should never be used directly. Access should be throug one of the
+/*! Should never be used directly. Access should be through one of the
  * CAP_PREFILL_* macros. */
 extern volatile uint8_t capture_PrefillComplete__;
 
