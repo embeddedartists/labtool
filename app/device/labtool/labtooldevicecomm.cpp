@@ -66,6 +66,7 @@ typedef struct
   uint32_t analogTrigSample;    /*!< Sample index when trigger occurred */
   uint32_t digitalChannelInfo;  /*!< Information about content of the digital data */
   uint32_t analogChannelInfo;   /*!< Information about content of the analog data */
+  int32_t  signalTrim;          /*!< Samples to remove from start (<0) or end (>0) of the data */
 } logic_samples_header;
 
 
@@ -1013,7 +1014,7 @@ void LabToolDeviceComm::transferSuccess(LabToolDeviceTransfer *transfer)
     case LabToolDeviceTransfer::CMD_CAP_DATA_ONLY:
         // actual sample data
         // give sampleHeader and transfer) to LabToolDevice to forward to UI
-        emit captureReceivedSamples(transfer, sampleHeader.digitalBufferSize + sampleHeader.analogBufferSize, sampleHeader.triggerInfo, sampleHeader.digitalTrigSample, sampleHeader.analogTrigSample, sampleHeader.digitalChannelInfo, sampleHeader.analogChannelInfo);
+        emit captureReceivedSamples(transfer, sampleHeader.digitalBufferSize + sampleHeader.analogBufferSize, sampleHeader.triggerInfo, sampleHeader.digitalTrigSample, sampleHeader.analogTrigSample, sampleHeader.digitalChannelInfo, sampleHeader.analogChannelInfo, sampleHeader.signalTrim);
         if (mRunningTransfer == transfer)
         {
             mRunningTransfer = NULL;

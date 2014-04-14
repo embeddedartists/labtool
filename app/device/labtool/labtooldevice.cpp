@@ -87,8 +87,8 @@ void LabToolDevice::handleNewConnection(LabToolDeviceComm *newComm)
     QObject::connect(mDeviceComm, SIGNAL(captureStopped()),
             mCaptureDevice, SLOT(handleStopped()));
 
-    QObject::connect(mDeviceComm, SIGNAL(captureReceivedSamples(LabToolDeviceTransfer*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int)),
-            mCaptureDevice, SLOT(handleReceivedSamples(LabToolDeviceTransfer*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int)));
+    QObject::connect(mDeviceComm, SIGNAL(captureReceivedSamples(LabToolDeviceTransfer*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int)),
+            mCaptureDevice, SLOT(handleReceivedSamples(LabToolDeviceTransfer*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int)));
 
     QObject::connect(mDeviceComm, SIGNAL(captureConfigurationDone()),
             mCaptureDevice, SLOT(handleConfigurationDone()));

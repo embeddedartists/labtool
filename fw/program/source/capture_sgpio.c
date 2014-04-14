@@ -106,11 +106,11 @@ static sgpio_concat_t concatenation = SGPIO_CONCAT_NONE;
  *
  * The input bit match interrupt is fired if a triggering condition has been
  * met. At that time the position in the circular buffer is saved and VADC is
- * notified (in case analog sampling is done in parallel). An end point is 
+ * notified (in case analog sampling is done in parallel). An end point is
  * calculated and then the sampling continues.
  *
  * After having copied the data into the circular buffer a test is made to see
- * if the end condition has been met and if so then the SGPIO is stopped and 
+ * if the end condition has been met and if so then the SGPIO is stopped and
  * the result is reported through a call to \ref capture_ReportSGPIODone.
  *
  *****************************************************************************/
@@ -289,16 +289,18 @@ void SGPIO_IRQHandler(void)
       if (!CAP_PREFILL_IS_SGPIO_DONE())
       {
         CAP_PREFILL_MARK_SGPIO_DONE();
-
-        // If no triggers are selected then use forced triggering, i.e. fill the
-        // capture buffer once and return that to the UI
-        if (forcedTrigger)
-        {
-          circbuff_last_sample = circbuff_num_samples + circbuff_sample_limit - 1;
-          triggered_pos = circbuff_num_samples + 1;
-        }
       }
     }
+
+    // If no triggers are selected then use forced triggering, i.e. fill the
+    // capture buffer once and return that to the UI
+    if (CAP_PREFILL_IS_PREFILL_DONE() && forcedTrigger && !triggered)
+    {
+      circbuff_last_sample = circbuff_num_samples + circbuff_sample_limit - 1;
+      triggered_pos = circbuff_num_samples + 1;
+      triggered = 1; // to prevent ending up here repeatedly
+    }
+
     if (++circbuff_num_samples == circbuff_last_sample)
     {
       // disable SGPIO

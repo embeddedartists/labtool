@@ -77,7 +77,7 @@ signals:
 
     void captureStopped();
     void captureConfigurationDone();
-    void captureReceivedSamples(LabToolDeviceTransfer* transfer, unsigned int size, unsigned int trigger, unsigned int digitalTrigSample, unsigned int analogTrigSample, unsigned int activeDigital, unsigned int activeAnalog);
+    void captureReceivedSamples(LabToolDeviceTransfer* transfer, unsigned int size, unsigned int trigger, unsigned int digitalTrigSample, unsigned int analogTrigSample, unsigned int activeDigital, unsigned int activeAnalog, int signalTrim);
     void captureFailed(const char* msg);
     void captureConfigurationFailed(const char* msg);
 

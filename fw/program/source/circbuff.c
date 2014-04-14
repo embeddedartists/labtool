@@ -121,6 +121,24 @@ void circbuff_Reset(circbuff_t* pBuff)
 
 /**************************************************************************//**
  *
+ * @brief  Returns true if the buffer is valid and is filled
+ *
+ * @param [in] pBuff       The buffer to reset
+ *
+ * @return TRUE if valid and filled
+ *
+ *****************************************************************************/
+Bool circbuff_Full(const circbuff_t * const pBuff)
+{
+  if (pBuff == NULL || pBuff->empty)
+  {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**************************************************************************//**
+ *
  * @brief  Returns the next position in the buffer that can hold \a incrInBytes bytes
  *
  * This operation moves the buffer's cursor effectively reserving the specified

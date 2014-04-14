@@ -580,6 +580,83 @@ static Bool LabTool_SendBuffer(const circbuff_t * const buff)
 
 /**************************************************************************//**
  *
+ * @brief  Handles synchronization of both analog and digital signals
+ *
+ * When both analog and digital signals are being sampled they will be in
+ * sync (i.e. the same number of samples taken) but the stopping conditions
+ * may differ which can cause one channel to have more samples than the other
+ * one. To fix this both channels will be streightened and then some samples
+ * will be removed from either the end or the start depending on which signal
+ * have the most samples. The actual removal is done in the PC client using
+ * the \a sampleTrim parameter passed in the header. This function returns
+ * that parameter after having repositioned the circular buffer for the analog
+ * signal.
+ *
+ * @retval -X  If X samples should be removed from the start of the data
+ * @retval  0  If the data should be left untouched
+ * @retval +X  If X samples should be removed from the end of the data
+ *
+ *****************************************************************************/
+static int LabTool_AlignSignals(void)
+{
+  int signalTrim = 0;
+
+  // Only need to align if both analog and digital signals are sampled and both
+  // buffers are filled.
+  if (circbuff_Full(samples.cap.sgpio_samples) && circbuff_Full(samples.cap.vadc_samples))
+  {
+    // As the buffers are both filled, there is the same number of samples in each.
+    // Calculate num samples in the buffer
+    uint32_t numSamples = circbuff_GetUsedSize(samples.cap.vadc_samples) / (2 * (samples.cap.vadcActiveChannels >> 16));
+
+    // Find last written position in each buffer
+    uint32_t offSGPIO = circbuff_GetFirstAddr(samples.cap.sgpio_samples) - (uint32_t)samples.cap.sgpio_samples->data;
+    uint32_t offVADC = circbuff_GetFirstAddr(samples.cap.vadc_samples) - (uint32_t)samples.cap.vadc_samples->data;
+
+    // Convert position into a sample index
+    uint32_t idxSGPIO = (32*offSGPIO) / ((samples.cap.sgpioActiveChannels >> 16) * 4);
+    uint32_t idxVADC = offVADC / (2 * (samples.cap.vadcActiveChannels >> 16));
+
+    // Move the position in the analog signal buffer so that it aligns with the digital one
+    samples.cap.vadc_samples->last = idxSGPIO * 2 * (samples.cap.vadcActiveChannels >> 16);
+
+    // Determine how many samples to discard based on how much further ahead one
+    // circular buffer is compared to the other one.
+    if (idxSGPIO > idxVADC) {
+      uint32_t diffA = idxSGPIO - idxVADC;
+      uint32_t diffB = numSamples + idxVADC - idxSGPIO;
+      if (diffA < diffB)
+      {
+        // SGPIO have diffA more samples
+        signalTrim = diffA; // remove diffA samples from end
+      }
+      else
+      {
+        // VADC has diffB more samples
+        signalTrim = -diffB; // remove diffB samples from start
+      }
+    }
+    else
+    {
+      uint32_t diffA = idxVADC - idxSGPIO;
+      uint32_t diffB = numSamples + idxSGPIO - idxVADC;
+      if (diffA < diffB)
+      {
+        // VADC have diffA more samples
+        signalTrim = -diffA; // remove diffA samples from start
+      }
+      else
+      {
+        // SGPIO has diffB more samples
+        signalTrim = diffB; // remove diffB samples from end
+      }
+    }
+  }
+  return signalTrim;
+}
+
+/**************************************************************************//**
+ *
  * @brief  Sends the captured samples to the client software
  *
  * The samples are sent on the bulk endpoint.
@@ -589,7 +666,7 @@ static Bool LabTool_SendBuffer(const circbuff_t * const buff)
  * \dot
  *  digraph structs {
  *      node [shape=record];
- *      message [label="START | Digital Size | Analog Size | Trigger | Digital Trig Sample | Analog Trig Sample | Active Digital Channels | Active Analog Channels | Digital Data | Analog Data"];
+ *      message [label="START | Digital Size | Analog Size | Trigger | Digital Trig Sample | Analog Trig Sample | Active Digital Channels | Active Analog Channels | Signal Trim | Digital Data | Analog Data"];
  *  }
  *  \enddot
  * Where each part is 32 bits and \a START is divided into four bytes like this:
@@ -605,28 +682,28 @@ static Bool LabTool_SendBuffer(const circbuff_t * const buff)
  * \dot
  *  digraph structs {
  *      node [shape=record];
- *      message [label="{START|0xEA05000C} | {Digital Size|0x00000000} | {Analog Size|0x00000000} | {Trigger|0x00000000} | {Digital Trig Sample|0x00000000} | {Analog Trig Sample|0x00000000} | {Active Digital Channels|0x00000085} | {Active Analog Channels|0x00000002}"];
+ *      message [label="{START|0xEA05000C} | {Digital Size|0x00000000} | {Analog Size|0x00000000} | {Trigger|0x00000000} | {Digital Trig Sample|0x00000000} | {Analog Trig Sample|0x00000000} | {Active Digital Channels|0x00000085} | {Active Analog Channels|0x00000002} | {Signal Trim|0x00000000}"];
  *  }
  *  \enddot
  * Example 2: Successful sampling of \a DIO_3:
  * \dot
  *  digraph structs {
  *      node [shape=record];
- *      message [label="{START|0xEA050000} | {Digital Size|0x00010000} | {Analog Size|0x00000000} | {Trigger|0x00000000} | {Digital Trig Sample|0x00000100} | {Analog Trig Sample|0x00000000} | {Active Digital Channels|0x00000008} | {Active Analog Channels|0x00000000} | {Digital Data|0x10000 bytes of samples}"];
+ *      message [label="{START|0xEA050000} | {Digital Size|0x00010000} | {Analog Size|0x00000000} | {Trigger|0x00000000} | {Digital Trig Sample|0x00000100} | {Analog Trig Sample|0x00000000} | {Active Digital Channels|0x00000008} | {Active Analog Channels|0x00000000} | {Signal Trim|0x00000000} | {Digital Data|0x10000 bytes of samples}"];
  *  }
  *  \enddot
  * Example 3: Successful sampling of \a A0 and \a A1:
  * \dot
  *  digraph structs {
  *      node [shape=record];
- *      message [label="{START|0xEA050000} | {Digital Size|0x00000000} | {Analog Size|0x00010000} | {Trigger|0x00000000} | {Digital Trig Sample|0x00000000} | {Analog Trig Sample|0x00001034} | {Active Digital Channels|0x00000000} | {Active Analog Channels|0x00000003} | {Analog Data|0x10000 bytes of samples}"];
+ *      message [label="{START|0xEA050000} | {Digital Size|0x00000000} | {Analog Size|0x00010000} | {Trigger|0x00000000} | {Digital Trig Sample|0x00000000} | {Analog Trig Sample|0x00001034} | {Active Digital Channels|0x00000000} | {Active Analog Channels|0x00000003} | {Signal Trim|0x00000000} | {Analog Data|0x10000 bytes of samples}"];
  *  }
  *  \enddot
  * Example 4: Successful sampling of \a DIO_0 .. \a DIO_7 and both analog channels:
  * \dot
  *  digraph structs {
  *      node [shape=record];
- *      message [label="{START|0xEA050000} | {Digital Size|0x00003200} | {Analog Size|0x0000C800} | {Trigger|0x00000000} | {Digital Trig Sample|0x000000e4} | {Analog Trig Sample|0x00000102} | {Active Digital Channels|0x000000ff} | {Active Analog Channels|0x00000003} | {Digital Data|0x3200 bytes of samples} | {Analog Data|0xC800 bytes of samples}"];
+ *      message [label="{START|0xEA050000} | {Digital Size|0x00003200} | {Analog Size|0x0000C800} | {Trigger|0x00000000} | {Digital Trig Sample|0x000000e4} | {Analog Trig Sample|0x00000102} | {Active Digital Channels|0x000000ff} | {Active Analog Channels|0x00000003} | {Signal Trim|0x00000042} | {Digital Data|0x3200 bytes of samples} | {Analog Data|0xC800 bytes of samples}"];
  *  }
  *  \enddot
  *
@@ -650,6 +727,7 @@ static void LabTool_SendSamples(void)
     Endpoint_Write_32_LE(0); //analog trigger sample
     Endpoint_Write_32_LE(0); //sgpio active channels
     Endpoint_Write_32_LE(0); //vadc active channels
+    Endpoint_Write_32_LE(0); //signal trim
     Endpoint_ClearIN();
     haveSamplesToSend = FALSE;
     return;
@@ -661,6 +739,7 @@ static void LabTool_SendSamples(void)
   Endpoint_Write_32_LE(samples.cap.vadcTrigSample);
   Endpoint_Write_32_LE(samples.cap.sgpioActiveChannels);
   Endpoint_Write_32_LE(samples.cap.vadcActiveChannels);
+  Endpoint_Write_32_LE(LabTool_AlignSignals());
   Endpoint_ClearIN();
 
   // send data
@@ -1364,7 +1443,7 @@ void usb_handler_Run(void)
   st_Wdt_Config wdtCfg;
 
   log_i("Started from %s\r\n", (WWDT_GetStatus(WWDT_TIMEOUT_FLAG) == SET)? "WDT" : "EXT");
-    
+
   log_i("Setting up watchdog\r\n");
 
   WWDT_Init();

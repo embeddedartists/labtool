@@ -504,82 +504,6 @@ LocateAnalogHighLowTransition_restart_comp:
 
 /*!
     Scans the list of calibrated (double format) analog samples specified
-    by the \a s parameter backwards, starting at \a offset, looking
-    for the position where the value goes from above \a highLevel to below
-    \a lowLevel.
-
-    As the list is searched backwards the search starts with the low level
-    and then the high level - the opposite of the forward search.
-
-    In cases where the sample rate is much higher than the frequency of
-    the sampled signal a lot of samples will have about the same value
-    and the returned index is calculated as the middle point between the
-    last value above \a highLevel and the first value below \a lowLevel.
-*/
-int LabToolCaptureDevice::locatePreviousAnalogHighLowTransition(QVector<double> *s, double lowLevel, double highLevel, int offset)
-{
-    int numSamples = s->size();
-
-    if (highLevel != lowLevel) {
-
-//        qDebug("dlocatePreviousAnalogHighLowTransition(lowLevel %f, highLevel %f, offset %d", lowLevel, highLevel, offset);
-//        qDebug("lowLevel %f, highLevel %f, looking for High->Low", lowLevel, highLevel);
-
-        for (int i = (offset >= numSamples ? numSamples-1 : offset); i >= 0; i--) {
-            if (s->at(i) < lowLevel) {
-LocatePreviousAnalogHighLowTransition_restart_comp:
-//                qDebug("s[%d]: %f below %f, restart", i, s->at(i), lowLevel);
-                int lastBelow = i;
-                while ((lastBelow >= 0) && (s->at(lastBelow) < lowLevel)) {
-//                    qDebug("s[%d]: %f still below %f", lastBelow, s->at(lastBelow), lowLevel);
-                    lastBelow--;
-                }
-
-                if (lastBelow >= 0) {
-//                    qDebug("s[%d]: %f broke while with < %f", lastBelow, s->at(lastBelow), lowLevel);
-                } else {
-//                    qDebug("s[%d]: broke while as \"out of bounds\"", lastBelow);
-                    break;
-                }
-
-                // found first value above low level, now find equal to or above high level
-                for (i = lastBelow; i >= 0; i--) {
-                    if (s->at(i) >= highLevel) {
-//                        qDebug("s[%d]: %f >= %f, done returning %d", i, s->at(i), highLevel, (i+lastBelow)/2);
-                        // found transition
-                        return (i+lastBelow)/2;
-                    }
-                    if (s->at(i) < lowLevel) {
-                        goto LocatePreviousAnalogHighLowTransition_restart_comp;
-                    }
-//                    qDebug("s[%d]: %f between %f and %f", i, s->at(i), lowLevel, highLevel);
-                }
-                break;
-            }
-            else {
-//                qDebug("s[%d]: %f  not below %f", i, s->at(i), lowLevel);
-            }
-        }
-    } else {
-        for (int i = (offset >= numSamples ? numSamples-1 : offset); i >= 0; i--) {
-            if (s->at(i) < lowLevel) {
-                // found first value below level, now find equal to or above level
-                for (i = i-1; i >= 0; i--) {
-                    if (s->at(i) >= highLevel) {
-                        // found transition
-                        return i+1;
-                    }
-                }
-                break;
-            }
-        }
-    }
-
-    return -1;
-}
-
-/*!
-    Scans the list of calibrated (double format) analog samples specified
     by the \a s parameter starting at \a offset, looking
     for the position where the value goes from below \a lowLevel to above
     \a highLevel.
@@ -652,75 +576,59 @@ LocateAnalogLowHighTransition_restart_comp:
 
 /*!
     Scans the list of calibrated (double format) analog samples specified
-    by the \a s parameter backwards, starting at \a offset, looking
-    for the position where the value goes from below \a lowLevel to above
-    \a highLevel.
+    by the \a s parameter from start to end looking for the specified
+    transition. The index of the transition closest to \a estimatedIdx
+    is returned.
 
-    In cases where the sample rate is much higher than the frequency of
-    the sampled signal a lot of samples will have about the same value
-    and the returned index is calculated as the middle point between the
-    last value below \a lowLevel and the first value above \a highLevel.
+    The search starts with the \a lowLevel and \a highLevel trigger levels
+    to find a transition but filtering out noise. If no such transition
+    can be found then a search is done with just the \a trigLevel instead.
+    If still no transition can be found then a -1 is returned.
 */
-int LabToolCaptureDevice::locatePreviousAnalogLowHighTransition(QVector<double> *s, double lowLevel, double highLevel, int offset)
+int LabToolCaptureDevice::locateTransition(QVector<double> *s, AnalogSignal::AnalogTriggerState trigState, double lowLevel, double trigLevel, double highLevel, int estimatedIdx)
 {
-    int numSamples = s->size();
+    int bestIdx = -1;
+    if (trigState == AnalogSignal::AnalogTriggerHighLow ||
+        trigState == AnalogSignal::AnalogTriggerLowHigh) {
 
-    if (highLevel != lowLevel) {
+        int newDiff;
+        int bestDiff = estimatedIdx;
+        int pos = 0;
+        do {
+            newDiff = abs(estimatedIdx - pos);
+            if (newDiff < bestDiff) {
+                //qDebug("locateTransition: found filtered %d, %d from estimated %d", pos, newDiff, estimatedIdx);
+                bestDiff = newDiff;
+                bestIdx = pos;
+            }
+            if (trigState == AnalogSignal::AnalogTriggerHighLow) {
+                pos = locateAnalogHighLowTransition(s, lowLevel, highLevel, pos+1);
+            } else {
+                pos = locateAnalogLowHighTransition(s, lowLevel, highLevel, pos+1);
+            }
+        } while ((pos != -1) && (newDiff <= bestDiff));
 
-//        qDebug("dlocatePreviousAnalogLowHighTransition(trigLevel %f, offset %d", trigLevel, offset);
-//        qDebug("lowLevel %f, highLevel %f, looking for High->Low", lowLevel, highLevel);
-
-        for (int i = (offset >= numSamples ? numSamples-1 : offset); i >= 0; i--) {
-            if (s->at(i) > highLevel) {
-LocatePreviousAnalogLowHighTransition_restart_comp:
-//                qDebug("s[%d]: %f above %f, restart", i, s->at(i), highLevel);
-                int lastAbove = i;
-                while ((lastAbove >= 0) && (s->at(lastAbove) > highLevel)) {
-//                    qDebug("s[%d]: %f still above %f", lastAbove, s->at(lastAbove), highLevel);
-                    lastAbove--;
+        // Search without filter?
+        if (bestIdx == -1) {
+            pos = 0;
+            bestIdx = 0;
+            bestDiff = estimatedIdx;
+            do {
+                newDiff = abs(estimatedIdx - pos);
+                if (newDiff < bestDiff) {
+                    //qDebug("locateTransition: found unfiltered %d, %d from estimated %d", pos, newDiff, estimatedIdx);
+                    bestDiff = abs(estimatedIdx - pos);
+                    bestIdx = pos;
                 }
-
-                if (lastAbove >= 0) {
-//                    qDebug("s[%d]: %f broke while with > %f", lastAbove, s->at(lastAbove), highLevel);
+                if (trigState == AnalogSignal::AnalogTriggerHighLow) {
+                    pos = locateAnalogHighLowTransition(s, trigLevel, trigLevel, pos+1);
                 } else {
-//                    qDebug("s[%d]: broke while as \"out of bounds\"", lastAbove);
-                    break;
+                    pos = locateAnalogLowHighTransition(s, trigLevel, trigLevel, pos+1);
                 }
-
-                // found first value below high level, now find equal to or below low level
-                for (i = lastAbove; i >= 0; i--) {
-                    if (s->at(i) <= lowLevel) {
-//                        qDebug("s[%d]: %f <= %f, done returning %d", i, s->at(i), lowLevel, (i+lastAbove)/2);
-                        // found transition
-                        return (i+lastAbove)/2;
-                    }
-                    if (s->at(i) > highLevel) {
-                        goto LocatePreviousAnalogLowHighTransition_restart_comp;
-                    }
-//                    qDebug("s[%d]: %f between %f and %f", i, s->at(i), lowLevel, highLevel);
-                }
-                break;
-            }
-            else {
-//                qDebug("s[%d]: %f  not above %f", i, s->at(i), highLevel);
-            }
-        }
-    } else {
-        for (int i = (offset >= numSamples ? numSamples-1 : offset); i >= 0; i--) {
-            if (s->at(i) > highLevel) {
-                // found first value above level, now find equal to or below level
-                for (i = i-1; i >= 0; i--) {
-                    if (s->at(i) <= lowLevel) {
-                        // found transition
-                        return i+1;
-                    }
-                }
-                break;
-            }
+            } while ((pos != -1) && (newDiff <= bestDiff));
         }
     }
-
-    return -1;
+    return bestIdx;
 }
 
 /*!
@@ -751,35 +659,16 @@ LocatePreviousAnalogLowHighTransition_restart_comp:
 
     The \a trig parameter holds the id of the channel that caused the trigger.
 
-    The \a digitalTrigSample and \a analogTrigSample parameters holds the current
-    sample index at the time of triggering. They exist regardless of what caused
-    the trigger (analog or digital) and are used to synchronize the signals in
-    time. Example: \a digitalTrigSample is 500 and \a analogTrigSample is 600.
-    The set of digital signals will be truncated and the last 100 samples removed.
-    The set of analog signals will have the first 100 samples removed. The result
-    is that both sets will be better aligned.
+    The \a digitalTrigSample parameter holds the current sample index at the
+    time of triggering. The \a signalTrim parameter is used to discard a number
+    of samples from the start (signalTrim < 0) or end of the data to compensate
+    for the fact that the analog and digital samplings are stopped at slightly
+    different times.
 */
-void LabToolCaptureDevice::convertDigitalInput(const quint8 *pData, quint32 size, quint32 activeChannels, quint32 trig, int digitalTrigSample, int analogTrigSample)
+void LabToolCaptureDevice::convertDigitalInput(const quint8 *pData, quint32 size, quint32 activeChannels, quint32 trig, int digitalTrigSample, int signalTrim)
 {
     quint32* samples = (quint32*)pData;
     int signalsInInput = activeChannels >> 16;
-
-    int samplePointDiff = analogTrigSample - digitalTrigSample;
-    if (analogTrigSample == 0) {
-        // no analog signals to adjust to. data only contains digital signals
-        samplePointDiff = 0;
-    }
-    if (samplePointDiff > 0) {
-        // need to remove samples from the start of the analog data
-        // and remove samples from the end of the digital data
-        // to align the two
-    } else if (samplePointDiff < 0){
-        // need to remove samples from the start of the digital data
-        // and remove samples from the end of the analog data
-        // to align the two
-        digitalTrigSample += samplePointDiff; // move trigger point
-        //qDebug("D: Diff %d, reduced digitalTrigSample to %d", samplePointDiff, digitalTrigSample);
-    }
 
     foreach(DigitalSignal* signal, mDigitalSignalList) {
         int id = signal->id();
@@ -803,26 +692,22 @@ void LabToolCaptureDevice::convertDigitalInput(const quint8 *pData, quint32 size
             }
         }
 
-        if (samplePointDiff > 0) {
-            // need to remove samples from the start of the analog data
-            // and remove samples from the end of the digital data
-            // to align the two
-            if (s->size() >= samplePointDiff) {
-                s->remove(s->size()-samplePointDiff-1, samplePointDiff);
-                //qDebug("D: Diff %d, removed %d samples from the end of the digital data", samplePointDiff, samplePointDiff);
+        if (signalTrim < 0) {
+            // remove abs(signalTrim) samples from the start of the data
+            if (s->size() >= -signalTrim) {
+                s->remove(0, -signalTrim);
+                //qDebug("D: Trim %d, removed %d samples from the start of the digital data", signalTrim, -signalTrim);
             } else {
-                //qDebug("D: Diff %d, removed all %d samples from the digital data", samplePointDiff, s->size());
+                //qDebug("D: Trim %d, removed all %d samples from the digital data", signalTrim, s->size());
                 s->clear();
             }
-        } else if (samplePointDiff < 0){
-            // need to remove samples from the start of the digital data
-            // and remove samples from the end of the analog data
-            // to align the two
-            if (s->size() >= -samplePointDiff) {
-                s->remove(0, -samplePointDiff);
-                //qDebug("D: Diff %d, removed %d samples from the start of the digital data", samplePointDiff, -samplePointDiff);
+        } else if (signalTrim > 0){
+            // remove abs(signalTrim) samples from the end of the data
+            if (s->size() >= signalTrim) {
+                s->remove(s->size()-signalTrim-1, signalTrim);
+                //qDebug("D: Trim %d, removed %d samples from the end of the digital data", signalTrim, signalTrim);
             } else {
-                //qDebug("D: Diff %d, removed all %d samples from the digital data", samplePointDiff, s->size());
+                //qDebug("D: Trim %d, removed all %d samples from the digital data", signalTrim, s->size());
                 s->clear();
             }
         }
@@ -1124,7 +1009,9 @@ void LabToolCaptureDevice::unpackAnalogInput(const quint8 *pData, quint32 size, 
 
 /*!
     Converts the signal data received for analog signals from the LabTool Hardware
-    into the format used by this application.
+    into the format used by this application. The return value reflects the validity
+    of the data. If the data was captured with a falling edge trigger and the received
+    data contains no falling edge then false is returned.
 
     The conversion is done in three steps:
     -# Use \ref unpackAnalogInput to creates one list of integer values per channel.
@@ -1141,15 +1028,13 @@ void LabToolCaptureDevice::unpackAnalogInput(const quint8 *pData, quint32 size, 
 
     The \a trig parameter holds the id of the channel that caused the trigger.
 
-    The \a digitalTrigSample and \a analogTrigSample parameters holds the current
-    sample index at the time of triggering. They exist regardless of what caused
-    the trigger (analog or digital) and are used to synchronize the signals in
-    time. Example: \a digitalTrigSample is 500 and \a analogTrigSample is 600.
-    The set of digital signals will be truncated and the last 100 samples removed.
-    The set of analog signals will have the first 100 samples removed. The result
-    is that both sets will be better aligned.
+    The \a analogTrigSample parameter holds the current sample index at the
+    time of triggering. The \a signalTrim parameter is used to discard a number
+    of samples from the start (signalTrim < 0) or end of the data to compensate
+    for the fact that the analog and digital samplings are stopped at slightly
+    different times.
 */
-void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size, quint32 activeChannels, quint32 trig, int analogTrigSample, int digitalTrigSample)
+void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size, quint32 activeChannels, quint32 trig, int analogTrigSample, int signalTrim)
 {
     (void)trig; // To avoid warning
     if (mAnalogSignalList.isEmpty()) {
@@ -1157,23 +1042,6 @@ void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size,
         return;
     }
     unpackAnalogInput(pData, size, activeChannels);
-
-    int samplePointDiff = analogTrigSample - digitalTrigSample;
-    if (digitalTrigSample == 0) {
-        // no digital signals to adjust to. data only contains analog signals
-        samplePointDiff = 0;
-    }
-    if (samplePointDiff > 0) {
-        // need to remove samples from the start of the analog data
-        // and remove samples from the end of the digital data
-        // to align the two
-        analogTrigSample -= samplePointDiff; // move trigger point
-        //qDebug("A: Diff %d, reduced analogTrigSample to %d", samplePointDiff, analogTrigSample);
-    } else if (samplePointDiff < 0){
-        // need to remove samples from the start of the digital data
-        // and remove samples from the end of the analog data
-        // to align the two
-    }
 
     LabToolCalibrationData* calib = mDeviceComm->storedCalibrationData();
 
@@ -1185,27 +1053,22 @@ void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size,
 
         if (mAnalogSignalData[id] == NULL) continue;
 
-        if (samplePointDiff > 0) {
-            // need to remove samples from the start of the analog data
-            // and remove samples from the end of the digital data
-            // to align the two
-            analogTrigSample -= samplePointDiff; // move trigger point
-            if (mAnalogSignalData[id]->size() >= samplePointDiff) {
-                mAnalogSignalData[id]->remove(0, samplePointDiff);
-                //qDebug("A: Diff %d, removed %d samples from the start of the analog data", samplePointDiff, samplePointDiff);
+        if (signalTrim < 0) {
+            // remove abs(signalTrim) samples from the start of the data
+            if (mAnalogSignalData[id]->size() >= -signalTrim) {
+                mAnalogSignalData[id]->remove(0, -signalTrim);
+                //qDebug("A: Trim %d, removed %d samples from the start of the analog data", signalTrim, -signalTrim);
             } else {
-                //qDebug("A: Diff %d, removed all %d samples from the analog data", samplePointDiff, mAnalogSignalData[id]->size());
+                //qDebug("A: Trim %d, removed all %d samples from the analog data", signalTrim, mAnalogSignalData[id]->size());
                 mAnalogSignalData[id]->clear();
             }
-        } else if (samplePointDiff < 0){
-            // need to remove samples from the start of the digital data
-            // and remove samples from the end of the analog data
-            // to align the two
-            if (mAnalogSignalData[id]->size() >= -samplePointDiff) {
-                mAnalogSignalData[id]->remove(mAnalogSignalData[id]->size()+samplePointDiff-1, -samplePointDiff);
-                //qDebug("A: Diff %d, removed %d samples from the end of the analog data", samplePointDiff, -samplePointDiff);
+        } else if (signalTrim > 0){
+            // remove abs(signalTrim) samples from the end of the data
+            if (mAnalogSignalData[id]->size() >= signalTrim) {
+                mAnalogSignalData[id]->remove(mAnalogSignalData[id]->size()-signalTrim-1, signalTrim);
+                //qDebug("A: Trim %d, removed %d samples from the end of the analog data", signalTrim, -signalTrim);
             } else {
-                //qDebug("A: Diff %d, removed all %d samples from the analog data", samplePointDiff, mAnalogSignalData[id]->size());
+                //qDebug("A: Trim %d, removed all %d samples from the analog data", signalTrim, mAnalogSignalData[id]->size());
                 mAnalogSignalData[id]->clear();
             }
         }
@@ -1236,85 +1099,17 @@ void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size,
                 highLevel = trigLevel + qAbs(b * mTriggerConfig->noiseFilter12BitLevel());
             }
 
-            int pos;
-            switch(signal->triggerState()) {
-            // Falling edge
-            case AnalogSignal::AnalogTriggerHighLow:
-                pos = locateAnalogHighLowTransition(s, lowLevel, highLevel, analogTrigSample-20);
-                if (pos != -1) {
-                    // found first possible trigger past the analogTrigSample location
-                    //qDebug("Found High->Low at %d, (+%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                    mTriggerIndex = pos;
-                }
-                pos = locatePreviousAnalogHighLowTransition(s, lowLevel, highLevel, analogTrigSample+20);
-                if (pos != -1) {
-                    // found last trigger before the analogTrigSample location
-                    //qDebug("Found High->Low at %d, (%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                    if (abs(pos-analogTrigSample) < 2*abs(mTriggerIndex-analogTrigSample)) { //*2 as we prefer to find the one prior to the analogTrigSample
-                        // this trigger is the closest one to the analogTrigSample location
-                        mTriggerIndex = pos;
-                    }
-                }
-                if (mTriggerIndex == 0) {
-                    // Could not find any trigger point after filtering. Try with the unfiltered search.
-                    pos = locateAnalogHighLowTransition(s, trigLevel, trigLevel, analogTrigSample-20);
-                    if (pos != -1) {
-                        // found first possible trigger past the analogTrigSample location
-                        //qDebug("Found unfiltered High->Low at %d, (+%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                        mTriggerIndex = pos;
-                    }
-                    pos = locatePreviousAnalogHighLowTransition(s, trigLevel, trigLevel, analogTrigSample+20);
-                    if (pos != -1) {
-                        // found last trigger before the analogTrigSample location
-                        //qDebug("Found unfiltered High->Low at %d, (%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                        if (abs(pos-analogTrigSample) < 2*abs(mTriggerIndex-analogTrigSample)) { //*2 as we prefer to find the one prior to the analogTrigSample
-                            // this trigger is the closest one to the analogTrigSample location
-                            mTriggerIndex = pos;
-                        }
-                    }
-                }
-                break;
+            if (signalTrim < 0) {
+                // Have removed abs(signalTrim) samples from the start of the data so the
+                // trigger point must be moved as well
 
-                // Rising edge
-            case AnalogSignal::AnalogTriggerLowHigh:
-                pos = locateAnalogLowHighTransition(s, lowLevel, highLevel, analogTrigSample-20);
-                if (pos != -1) {
-                    // found first possible trigger past the analogTrigSample location
-                    //qDebug("Found Low->High at %d, (+%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                    mTriggerIndex = pos;
-                }
-                pos = locatePreviousAnalogLowHighTransition(s, lowLevel, highLevel, analogTrigSample+20);
-                if (pos != -1) {
-                    // found last trigger before the analogTrigSample location
-                    //qDebug("Found Low->High at %d, (%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                    if (abs(pos-analogTrigSample) < 2*abs(mTriggerIndex-analogTrigSample)) { //*2 as we prefer to find the one prior to the analogTrigSample
-                        // this trigger is the closest one to the analogTrigSample location
-                        mTriggerIndex = pos;
-                    }
-                }
-                if (mTriggerIndex == 0) {
-                    // Could not find any trigger point after filtering. Try with the unfiltered search.
-                    pos = locateAnalogLowHighTransition(s, trigLevel, trigLevel, analogTrigSample-20);
-                    if (pos != -1) {
-                        // found first possible trigger past the analogTrigSample location
-                        //qDebug("Found unfiltered Low->High at %d, (+%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                        mTriggerIndex = pos;
-                    }
-                    pos = locatePreviousAnalogLowHighTransition(s, trigLevel, trigLevel, analogTrigSample+20);
-                    if (pos != -1) {
-                        // found last trigger before the analogTrigSample location
-                        //qDebug("Found unfiltered Low->High at %d, (%d from %d)", pos, pos - analogTrigSample, analogTrigSample);
-                        if (abs(pos-analogTrigSample) < 2*abs(mTriggerIndex-analogTrigSample)) { //*2 as we prefer to find the one prior to the analogTrigSample
-                            // this trigger is the closest one to the analogTrigSample location
-                            mTriggerIndex = pos;
-                        }
-                    }
-                }
-                break;
+                qDebug("analogTrigSample = %u, moved to %u", analogTrigSample, analogTrigSample-abs(signalTrim));
+                analogTrigSample -= abs(signalTrim);
+            }
 
-                // Not a trigger
-            default:
-                break;
+            int pos = locateTransition(s, signal->triggerState(), lowLevel, trigLevel, highLevel, analogTrigSample);
+            if (pos != -1) {
+                mTriggerIndex = pos;
             }
         }
 
@@ -1600,7 +1395,7 @@ void LabToolCaptureDevice::handleConfigurationFailure(const char *msg)
     be unpacked. Finally a \ref captureFinished signal will be sent to
     indicate the successful end of the capturing.
 */
-void LabToolCaptureDevice::handleReceivedSamples(LabToolDeviceTransfer* transfer, unsigned int size, unsigned int trigger, unsigned int digitalTrigSample, unsigned int analogTrigSample, unsigned int digitalChannelInfo, unsigned int analogChannelInfo)
+void LabToolCaptureDevice::handleReceivedSamples(LabToolDeviceTransfer* transfer, unsigned int size, unsigned int trigger, unsigned int digitalTrigSample, unsigned int analogTrigSample, unsigned int digitalChannelInfo, unsigned int analogChannelInfo, int signalTrim)
 {
     if (mReconfigurationRequested && hasConfigChanged()) {
         // will restart capture with the new data so discard this set
@@ -1612,8 +1407,9 @@ void LabToolCaptureDevice::handleReceivedSamples(LabToolDeviceTransfer* transfer
 
         mUsedSampleRate = mRequestedSampleRate;
         mTriggerIndex = 0;
-        convertDigitalInput(transfer->data(), size-analogSize, digitalChannelInfo, trigger, digitalTrigSample, analogTrigSample);
-        convertAnalogInput(transfer->data()+analogOffset, analogSize, analogChannelInfo, trigger, analogTrigSample, digitalTrigSample);
+
+        convertDigitalInput(transfer->data(), size-analogSize, digitalChannelInfo, trigger, digitalTrigSample, signalTrim);
+        convertAnalogInput(transfer->data()+analogOffset, analogSize, analogChannelInfo, trigger, analogTrigSample, signalTrim);
         qDebug() << "Got " << size << "bytes with samples";
         //qDebug() << "Digital trigger at " << digitalTrigSample << ", analog at " << analogTrigSample;
 

@@ -63,7 +63,7 @@ private slots:
     void handleStopped();
     void handleConfigurationDone();
     void handleConfigurationFailure(const char* msg);
-    void handleReceivedSamples(LabToolDeviceTransfer* transfer, unsigned int size, unsigned int trigger, unsigned int digitalTrigSample, unsigned int analogTrigSample, unsigned int digitalChannelInfo, unsigned int analogChannelInfo);
+    void handleReceivedSamples(LabToolDeviceTransfer* transfer, unsigned int size, unsigned int trigger, unsigned int digitalTrigSample, unsigned int analogTrigSample, unsigned int digitalChannelInfo, unsigned int analogChannelInfo, int signalTrim);
     void handleFailedCapture(const char* msg);
     void handleReconfigurationTimer();
 
@@ -102,15 +102,14 @@ private:
     int locatePreviousLevel(QVector<int> *s, int level, int offset);
 
     int locateAnalogHighLowTransition(QVector<double> *s, double lowLevel, double highLevel, int offset);
-    int locatePreviousAnalogHighLowTransition(QVector<double> *s, double lowLevel, double highLevel, int offset);
     int locateAnalogLowHighTransition(QVector<double> *s, double lowLevel, double highLevel, int offset);
-    int locatePreviousAnalogLowHighTransition(QVector<double> *s, double lowLevel, double highLevel, int offset);
+    int locateTransition(QVector<double> *s, AnalogSignal::AnalogTriggerState trigState, double lowLevel, double trigLevel, double highLevel, int estimatedIdx);
 
     bool detectAnalogSignalFrequency(int id, quint16 trigLevel, bool fallingEdge);
-    void convertDigitalInput(const quint8* pData, quint32 size, quint32 activeChannels, quint32 trig, int digitalTrigSample, int analogTrigSample);
+    void convertDigitalInput(const quint8* pData, quint32 size, quint32 activeChannels, quint32 trig, int digitalTrigSample, int signalTrim);
     void unpackAnalogInput(const quint8 *pData, quint32 size, quint32 activeChannels);
     void convertHiddenAnalogInput(const quint8 *pData, quint32 size);
-    void convertAnalogInput(const quint8* pData, quint32 size, quint32 activeChannels, quint32 trig, int analogTrigSample, int digitalTrigSample);
+    void convertAnalogInput(const quint8* pData, quint32 size, quint32 activeChannels, quint32 trig, int analogTrigSample, int signalTrim);
     void saveData(const quint8* pData, quint32 size);
     void deleteSignals();
 

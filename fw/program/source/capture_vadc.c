@@ -206,7 +206,7 @@ static uint32_t post_fill_llis = 0;
  *  -# The very last entry of the DMA's LLI chain has been completed. This
  *     happens when a trigger has been found, see \ref cap_vadc_Triggered.
  *     When it happens the VADC is stopped and the result is reported through
- *     the \ref capture_ReportSGPIODone
+ *     the \ref capture_ReportVADCDone
  *     
  *****************************************************************************/
 void DMA_IRQHandler (void)

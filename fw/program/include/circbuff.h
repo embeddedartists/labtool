@@ -62,6 +62,7 @@ typedef struct
 void circbuff_Init(circbuff_t* pBuff, uint32_t addr, uint32_t maxSize);
 void circbuff_Resize(circbuff_t* pBuff, uint32_t actualSize);
 void circbuff_Reset(circbuff_t* pBuff);
+Bool circbuff_Full(const circbuff_t * const pBuff);
 uint32_t circbuff_NextPos(circbuff_t* pBuff, uint32_t incrInBytes);
 uint32_t circbuff_GetFirstAddr(const circbuff_t * const pBuff);
 
