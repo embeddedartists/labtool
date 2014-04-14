@@ -53,6 +53,9 @@ UiSimpleAbstractSignal::UiSimpleAbstractSignal(QWidget *parent) :
     mConfigureBtn->hide();
 
     // Deallocation: "Qt Object trees" (See UiMainWindow)
+    mColorLbl = new QLabel(this);
+
+    // Deallocation: "Qt Object trees" (See UiMainWindow)
     mIdLbl = new QLabel(this);
 
     // Deallocation: "Qt Object trees" (See UiMainWindow)

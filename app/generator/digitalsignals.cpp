@@ -216,7 +216,6 @@ QVariant DigitalSignals::data(const QModelIndex &index, int role) const
         return tr("Double-click to configure");
     }
 
-
     return QVariant();
 }
 
@@ -234,7 +233,8 @@ QVariant DigitalSignals::headerData(int section, Qt::Orientation orientation,
         switch(orientation) {
         case Qt::Horizontal:
             if (section == 0) {
-                return tr("Signal");
+                // The spaces below are needed to get an initial column width
+                return tr("Signal              ");
             }
             else if (section <= mNumStates) {
                 // return state number
@@ -242,7 +242,6 @@ QVariant DigitalSignals::headerData(int section, Qt::Orientation orientation,
             }
             break;
         case Qt::Vertical:
-
             QList<DigitalSignal*> list = device->digitalSignals();
 
             if (section < list.size()) {

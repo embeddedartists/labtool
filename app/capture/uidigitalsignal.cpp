@@ -58,6 +58,10 @@ UiDigitalSignal::UiDigitalSignal(DigitalSignal* s, QWidget *parent) :
     mIdLbl->setText(QString("D%1").arg(s->id()));
     mNameLbl->setText(s->name());
 
+    mColorLbl->setText("    ");
+    QString color = Configuration::instance().digitalCableColor(s->id()).name();
+    mColorLbl->setStyleSheet(QString("QLabel { background-color : %1; }").arg(color));
+
     // Deallocation: "Qt Object trees" (See UiMainWindow)
     mTrigger = new UiDigitalTrigger(this);
     mTrigger->setState(s->triggerState());
@@ -423,9 +427,12 @@ void UiDigitalSignal::doLayout()
     QRect r = infoContentRect();
     int y = r.top();
 
-    mIdLbl->move(r.left(), y);
+    mColorLbl->move(r.left(), y);
 
-    int x = mIdLbl->pos().x()+mIdLbl->width() + SignalIdMarginRight;
+    int x = mColorLbl->pos().x()+mColorLbl->width() + SignalIdMarginRight;
+    mIdLbl->move(x, y);
+
+    x += mIdLbl->width() + SignalIdMarginRight;
     mNameLbl->move(x, y);
     mEditName->move(x, y);
 

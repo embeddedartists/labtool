@@ -25,6 +25,7 @@
 
 #include "uieditdigital.h"
 
+#include "common/configuration.h"
 #include "device/digitalsignal.h"
 
 
@@ -73,8 +74,26 @@ void DigitalDelegate::paint(QPainter *painter,
         painter->save();
 
         if (index.column() == 0) {
+            int colorSquareSize = option.rect.height()/2;
+            int colorSquareGap = 5;
             str = signal->name();
-            painter->drawText(option.rect, Qt::AlignCenter, str);
+            QColor c = Configuration::instance().digitalCableColor(signal->id());
+            painter->fillRect(option.rect.x()+colorSquareGap,
+                              option.rect.y() + (option.rect.height()-colorSquareSize)/2,
+                              colorSquareSize,
+                              colorSquareSize, c);
+            if (c == Qt::white) {
+                // Add border so that the square is not invisible
+                painter->drawRect(option.rect.x()+colorSquareGap,
+                                  option.rect.y() + (option.rect.height()-colorSquareSize)/2,
+                                  colorSquareSize,
+                                  colorSquareSize);
+            }
+            painter->drawText(option.rect.x() + colorSquareSize + 2*colorSquareGap,
+                              option.rect.y(),
+                              option.rect.width() - (colorSquareSize + 2*colorSquareGap),
+                              option.rect.height(),
+                              Qt::AlignLeft | Qt::AlignVCenter, str);
         }
 
         else {

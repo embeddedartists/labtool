@@ -26,6 +26,7 @@
 #include "signalmanager.h"
 #include "uidigitalsignal.h"
 #include "uianalogsignal.h"
+#include "common/configuration.h"
 #include "device/devicemanager.h"
 #include "analyzer/analyzermanager.h"
 
@@ -160,11 +161,18 @@ QWidget* UiSelectSignalDialog::createDigitalSignalBox(QList<int> &list)
 
     for (int i = 0; i < list.size(); i++) {
         int id = list.at(i);
+
         // Deallocation: "Qt Object trees" (See UiMainWindow)
-        l->addWidget(new QLabel(QString("D%1").arg(id), this), 0, i);
+        QLabel* cl = new QLabel("    ");
+        QString color = Configuration::instance().digitalCableColor(id).name();
+        cl->setStyleSheet(QString("QLabel { background-color : %1; }").arg(color));
+        l->addWidget(cl, 0, i);
+
+        // Deallocation: "Qt Object trees" (See UiMainWindow)
+        l->addWidget(new QLabel(QString("D%1").arg(id), this), 1, i);
         // Deallocation: "Qt Object trees" (See UiMainWindow)
         QCheckBox* cb = new QCheckBox(this);
-        l->addWidget(cb, 1, i);
+        l->addWidget(cb, 2, i);
         mDigitalSignalsMap.insert(id, cb);
     }
 
@@ -190,11 +198,18 @@ QWidget* UiSelectSignalDialog::createAnalogSignalBox(QList<int> &list)
 
     for (int i = 0; i < list.size(); i++) {
         int id = list.at(i);
+
         // Deallocation: "Qt Object trees" (See UiMainWindow)
-        l->addWidget(new QLabel(QString("A%1").arg(id), this), 0, i);
+        QLabel* cl = new QLabel("    ");
+        QString color = Configuration::instance().analogInCableColor(id).name();
+        cl->setStyleSheet(QString("QLabel { background-color : %1; }").arg(color));
+        l->addWidget(cl, 0, i);
+
+        // Deallocation: "Qt Object trees" (See UiMainWindow)
+        l->addWidget(new QLabel(QString("A%1").arg(id), this), 1, i);
         // Deallocation: "Qt Object trees" (See UiMainWindow)
         QCheckBox* cb = new QCheckBox(this);
-        l->addWidget(cb, 1, i);
+        l->addWidget(cb, 2, i);
         mAnalogSignalsMap.insert(id, cb);
     }
 

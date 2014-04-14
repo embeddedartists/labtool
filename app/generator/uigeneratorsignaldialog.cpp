@@ -22,6 +22,8 @@
 #include <QCheckBox>
 #include <QLabel>
 
+#include "common/configuration.h"
+
 /*!
     \class UiGeneratorSignalDialog
     \brief Dialog window used by user to select which signals to use for
@@ -147,24 +149,34 @@ QWidget* UiGeneratorSignalDialog::createSignalBox(SignalType type,
     for (int i = 0; i < list.size(); i++) {
         int id = list.at(i);
         QLabel* lbl = NULL;
+
+        // Deallocation: "Qt Object trees" (See UiMainWindow)
+        QLabel* cl = new QLabel("    ");
+        QString color;
+
         switch(type) {
         case SignalDigital:
+            color = Configuration::instance().digitalCableColor(id).name();
+            cl->setStyleSheet(QString("QLabel { background-color : %1; }").arg(color));
+
             // Deallocation: "Qt Object trees" (See UiMainWindow)
             lbl = new QLabel(QString("D%1").arg(id), this);
             map = &mDigitalSignalsMap;
             break;
         case SignalAnalog:
+            color = Configuration::instance().analogOutCableColor(id).name();
+            cl->setStyleSheet(QString("QLabel { background-color : %1; }").arg(color));
+
             // Deallocation: "Qt Object trees" (See UiMainWindow)
             lbl = new QLabel(QString("A%1").arg(id), this);
             map = &mAnalogSignalsMap;
             break;
         }
-
-
-        l->addWidget(lbl, 0, i);
+        l->addWidget(cl, 0, i);
+        l->addWidget(lbl, 1, i);
         // Deallocation: "Qt Object trees" (See UiMainWindow)
         QCheckBox* cb = new QCheckBox(this);
-        l->addWidget(cb, 1, i);
+        l->addWidget(cb, 2, i);
         map->insert(id, cb);
     }
 

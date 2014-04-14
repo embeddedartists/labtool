@@ -54,9 +54,14 @@ public:
     void   setGridColor(QColor &c);
     QColor analyzerColor();
     void   setAnalyzerColor(QColor &c);
+    void   setDigitalCableColor(int id, QColor &c);
+    QColor digitalCableColor(int id);
+    void   setAnalogInCableColor(int id, QColor &c);
+    QColor analogInCableColor(int id);
+    void   setAnalogOutCableColor(int id, QColor &c);
+    QColor analogOutCableColor(int id);
 
     QColor outsidePlotColor();
-
 
     void loadLightScheme();
     void loadDarkScheme();
@@ -89,8 +94,9 @@ private:
     QColor mCursorColors[MaxCursorColors];
     QColor mGridColor;
     QColor mAnalyzerColor;
-
-    
+    QColor mDigitalCableColors[MaxDigitalColors];
+    QColor mAnalogInCableColors[MaxAnalogColors];
+    QColor mAnalogOutCableColors[MaxAnalogColors];
 };
 
 #endif // CONFIGURATION_H

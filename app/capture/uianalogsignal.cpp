@@ -57,6 +57,8 @@ public:
     /*! Analog signal */
     AnalogSignal* mSignal;
 
+    /*! Color widget */
+    QLabel* mColorLbl;
     /*! ID widget */
     QLabel* mIdLbl;
     /*! Name widget */
@@ -101,6 +103,7 @@ public:
 UiAnalogSignalPrivate::UiAnalogSignalPrivate()
 {
     mSignal = NULL;
+    mColorLbl  = NULL;
     mIdLbl  = NULL;
     mName   = NULL;
     mEditName   = NULL;
@@ -118,6 +121,8 @@ UiAnalogSignalPrivate::UiAnalogSignalPrivate()
 */
 UiAnalogSignalPrivate::~UiAnalogSignalPrivate()
 {
+    mColorLbl->close();
+    delete mColorLbl;
 
     mIdLbl->close();
     delete mIdLbl;
@@ -153,6 +158,13 @@ UiAnalogSignalPrivate::~UiAnalogSignalPrivate()
 void UiAnalogSignalPrivate::setup(AnalogSignal* signal, UiAnalogSignal* parent)
 {
     mSignal = signal;
+
+    // Deallocation: Destructor
+    mColorLbl = new QLabel(parent);
+    mColorLbl->setText("    ");
+    QString color = Configuration::instance().analogInCableColor(signal->id()).name();
+    mColorLbl->setStyleSheet(QString("QLabel { background-color : %1; }").arg(color));
+    mColorLbl->show();
 
     // Deallocation: Destructor
     mIdLbl = new QLabel(parent);
@@ -280,6 +292,10 @@ void UiAnalogSignalPrivate::setGeometry(int x, int y, int w, int h)
 
     mDisableBtn->move(x+w-mDisableBtn->width(), wy);
     wy = wy + mDisableBtn->height();
+
+    mColorLbl->move(wx, wy);
+    wx = mColorLbl->pos().x()+mColorLbl->width()
+            + UiAnalogSignal::SignalIdMarginRight;
 
     mIdLbl->move(wx, wy);
 

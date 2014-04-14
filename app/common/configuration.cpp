@@ -63,6 +63,24 @@ const QString Configuration::ProjectBinFileExt = ".eab";
 Configuration::Configuration()
 {
     loadColorScheme(COLOR_SCHEME_LIGHT);
+
+    // Cable colors does not change with the color scheme
+    // so it is specified here instead
+    mDigitalCableColors[0] = Qt::black;
+    mDigitalCableColors[1] = QColor("#A0522D"); // sienna (brown)
+    mDigitalCableColors[2] = Qt::red;
+    mDigitalCableColors[3] = QColor("#FFA500"); // orange
+    mDigitalCableColors[4] = Qt::yellow;
+    mDigitalCableColors[5] = QColor("#32CD32"); // lime green
+    mDigitalCableColors[6] = Qt::blue;
+    mDigitalCableColors[7] = QColor("#DA70D6"); // orchid (purple)
+    mDigitalCableColors[8] = Qt::gray;
+    mDigitalCableColors[9] = Qt::white;
+    mDigitalCableColors[10] = Qt::black;
+    mAnalogInCableColors[0] = Qt::black;
+    mAnalogInCableColors[1] = Qt::red;
+    mAnalogOutCableColors[0] = Qt::blue;
+    mAnalogOutCableColors[1] = Qt::gray;
 }
 
 /*!
@@ -241,6 +259,66 @@ void Configuration::setAnalyzerColor(QColor &c)
 }
 
 /*!
+    Returns the color of the cable for the digital signal with ID \a id.
+*/
+QColor Configuration::digitalCableColor(int id)
+{
+    if (id < 0) id = 0;
+
+    return mDigitalCableColors[ (id%MaxDigitalColors) ];
+}
+
+/*!
+    Set the color of the cable for the digital signal with ID \a id to \a c.
+*/
+void Configuration::setDigitalCableColor(int id, QColor &c)
+{
+    if (id < 0) id = 0;
+
+    mDigitalCableColors[ (id%MaxDigitalColors) ] = c;
+}
+
+/*!
+    Returns the color of the cable for the analog input signal with ID \a id.
+*/
+QColor Configuration::analogInCableColor(int id)
+{
+    if (id < 0) id = 0;
+
+    return mAnalogInCableColors[ (id%MaxAnalogColors) ];
+}
+
+/*!
+    Set the color of the cable for the analog input signal with ID \a id to \a c.
+*/
+void Configuration::setAnalogInCableColor(int id, QColor &c)
+{
+    if (id < 0) id = 0;
+
+    mAnalogInCableColors[ (id%MaxAnalogColors) ] = c;
+}
+
+/*!
+    Returns the color of the cable for the analog output signal with ID \a id.
+*/
+QColor Configuration::analogOutCableColor(int id)
+{
+    if (id < 0) id = 0;
+
+    return mAnalogOutCableColors[ (id%MaxAnalogColors) ];
+}
+
+/*!
+    Set the color of the cable for the analog output signal with ID \a id to \a c.
+*/
+void Configuration::setAnalogOutCableColor(int id, QColor &c)
+{
+    if (id < 0) id = 0;
+
+    mAnalogOutCableColors[ (id%MaxAnalogColors) ] = c;
+}
+
+/*!
     Returns the color used as background color for widgets surrounding the
     signal plot.
 */
@@ -281,7 +359,6 @@ void Configuration::loadLightScheme()
     mCursorColors[4] = Qt::darkGreen;
 
     mGridColor = Qt::gray;
-
 }
 
 /*!
@@ -315,5 +392,4 @@ void Configuration::loadDarkScheme()
     mCursorColors[4] = Qt::darkGreen;
 
     mGridColor = Qt::gray;
-
 }

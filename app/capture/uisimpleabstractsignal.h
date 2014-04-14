@@ -39,6 +39,7 @@ public slots:
 
 protected:
 
+    QLabel* mColorLbl;
     QLabel* mIdLbl;
     QLabel* mNameLbl;
     QLineEdit* mEditName;
