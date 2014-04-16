@@ -69,6 +69,7 @@ void UiDigitalGroup::setCycleData(double start, double mid, double end,
     }
 
     doLayout();
+    repaint();
 }
 
 /*!

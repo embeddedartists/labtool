@@ -816,7 +816,6 @@ void LabToolCaptureDevice::convertDigitalInput(const quint8 *pData, quint32 size
 
         }
 
-
         if (mDigitalSignals[id] != NULL) {
             delete mDigitalSignals[id];
         }
@@ -1130,10 +1129,10 @@ void LabToolCaptureDevice::start(int sampleRate)
 
         LabToolCalibrationData* mCalib = mDeviceComm->storedCalibrationData();
         if (mCalib == NULL || mCalib->isDefaultData()) {
-            captureFinished(false, "The connected LabTool Device hardware has not been calibrated "
-                            "and is running with default parameters. "
-                            "Run the Calibration Wizard to correct it.\n"
-                            "This capture has been aborted!");
+            emit captureFinished(false, "The connected LabTool Device hardware has not been calibrated "
+                                 "and is running with default parameters. "
+                                 "Run the Calibration Wizard to correct it.\n"
+                                 "This capture has been aborted!");
             return;
         }
     }
@@ -1150,6 +1149,7 @@ void LabToolCaptureDevice::start(int sampleRate)
     mRunningCapture = true;
     if (hasConfigChanged()) {
         qDebug("Configuration has changed and will be pushed to target");
+        saveConfig();
         mDeviceComm->configureCapture(configSize(), configData());
     } else {
         //qDebug("Configuration same as last time");
@@ -1367,13 +1367,17 @@ void LabToolCaptureDevice::handleStopped()
 */
 void LabToolCaptureDevice::handleConfigurationDone()
 {
-    // now that the configuration has been applied, save current configuration
-    saveConfig();
-
-    // configuration only done immediately before running, so run now
-    //qDebug("Configuration done, time to run");
-    mDeviceComm->runCapture();
-    mRunningCapture = true;
+    if (hasConfigChanged()) {
+        // configuration changed while configuring, do a reconfiguration
+        //qDebug("Configuration changed while configuring. Doing it again");
+        saveConfig();
+        mDeviceComm->configureCapture(configSize(), configData());
+    } else {
+        // configuration only done immediately before running, so run now
+        //qDebug("Configuration done, time to run");
+        mDeviceComm->runCapture();
+        mRunningCapture = true;
+    }
 }
 
 /*!
