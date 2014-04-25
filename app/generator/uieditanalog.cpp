@@ -81,6 +81,18 @@ UiEditAnalog::UiEditAnalog(AnalogSignal *signal, QWidget *parent) :
 
 
 /*!
+    Marks the signal as invalid and disconnects the editor. This is needed
+    to prevent calls to handleNameEdited() after the AnalogSignal has been
+    deleted elsewhere.
+*/
+void UiEditAnalog::invalidateSignal()
+{
+    disconnect(mNameEdit, SIGNAL(editingFinished()),
+               this, SLOT(handleNameEdited()));
+    mSignal = NULL;
+}
+
+/*!
     Creates and returns a box where the analog waveform can be chosen.
     The current waveform is set to \a selected.
 */
@@ -178,10 +190,10 @@ void UiEditAnalog::handleNameEdited()
     QString n = mNameEdit->text();
     if (n.isEmpty() || n.isNull()) {
         n = mSignal->name();
+        mNameEdit->setText(n);
+    } else if (mNameEdit->text() != mSignal->name()) {
+        mSignal->setName(n);
     }
-
-    mSignal->setName(n);
-    mNameEdit->setText(n);
 }
 
 /*!

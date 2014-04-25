@@ -81,7 +81,6 @@ void UiAnalogGenerator::handleDeviceChanged()
     // We cannot call removeAllSignals here since we would then delete
     // signals in the active device.
 
-
     QList<QMdiSubWindow*> list = mWinArea->subWindowList();
     foreach(QMdiSubWindow* win, list) {
         closeWindow(win, false);
@@ -197,6 +196,8 @@ void UiAnalogGenerator::closeWindow(QMdiSubWindow* win, bool removeSignal)
 
     AnalogSignal* signal = editWidget->signal();
 
+    editWidget->invalidateSignal();
+
     mWinArea->removeSubWindow(win);
 
     if (removeSignal) {
@@ -205,12 +206,7 @@ void UiAnalogGenerator::closeWindow(QMdiSubWindow* win, bool removeSignal)
 
     // when deleting win the associated widget (editWidget) will also
     // be deleted since win has ownership of editWidget
-    //delete win;
-
-    // 2013-03-28 Commented out the "delete win" line as it causes
-    // segmentation faults when closing the window every time.
-    // Problem does not occur in Linux. On Windows it occurs both for
-    // the device and the simulator.
+    delete win;
 }
 
 /*!

@@ -32,6 +32,7 @@ public:
     explicit UiEditAnalog(AnalogSignal* signal, QWidget *parent = 0);
 
     AnalogSignal* signal() {return mSignal;}
+    void invalidateSignal();
     
 signals:
     
