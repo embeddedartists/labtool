@@ -390,6 +390,58 @@ void LabToolCaptureDevice::calibrate(QWidget *parent)
 }
 
 /*!
+    Removes \a numToRemove elements from the \a s list of signal samples.
+    The parameter \a removeFromStart dictates if the samples should be
+    removed from the start or end of the list. If the list contains
+    fewer than \a numToRemove elements all will be removed.
+*/
+template <typename T>
+void LabToolCaptureDevice::trimSignalData(QVector<T> *s, int numToRemove, bool removeFromStart) const
+{
+    if ((s != NULL) && (numToRemove > 0)) {
+
+        if (s->size() <= numToRemove) {
+            s->clear();
+        } else if (removeFromStart) {
+            s->remove(0, numToRemove);
+        } else {
+            s->remove(s->size() - numToRemove, numToRemove);
+        }
+    }
+}
+
+/*!
+    Compensates for the delay in the analog hardware so that the analog and
+    digital signals line up. A few samples are removed from the start of the
+    signal (if digital) or end of the signal (if analog). This compensation
+    is only needed when both analog and digital signals are sampled.
+    The parameter \a s is the list of samples, parameter \a isAnalogSignal
+    is used to determine if the samples should be removed from the start
+    or end of the list.
+*/
+template <typename T>
+void LabToolCaptureDevice::compensateForAnalogHardware(QVector<T> *s, bool isAnalogSignal) const
+{
+    if (!mAnalogSignalList.isEmpty() && !mDigitalSignalList.isEmpty()) {
+        int numToRemove = 0;
+
+        // The delay is roughly 200ns but was adjusted in detail using an
+        // external oscilloscope. As there is a limit on maximum sample
+        // rate when sampling both analog and digital signals of 20MHz
+        // there is no point in correcting higher sample rates. For sample
+        // rates below 5MHz the resolution is already below 200ns so
+        // correcting even one sample is too much.
+        switch (mUsedSampleRate) {
+        case  5000000: numToRemove = 3; break;
+        case 10000000: numToRemove = 4; break;
+        case 20000000: numToRemove = 5; break;
+        }
+
+        trimSignalData(s, numToRemove, !isAnalogSignal);
+    }
+}
+
+/*!
     Scans the list of digital samples and locates the first entry with the correct
     level and returns it's index. The parameter \a s is the list of digital
     samples, parameter \a level is either one or zero. The \a offset parameter
@@ -692,24 +744,15 @@ void LabToolCaptureDevice::convertDigitalInput(const quint8 *pData, quint32 size
             }
         }
 
+        // Compensate for the delay in the analog hardware so that the analog and digital signals line up.
+        compensateForAnalogHardware(s, false);
+
         if (signalTrim < 0) {
             // remove abs(signalTrim) samples from the start of the data
-            if (s->size() >= -signalTrim) {
-                s->remove(0, -signalTrim);
-                //qDebug("D: Trim %d, removed %d samples from the start of the digital data", signalTrim, -signalTrim);
-            } else {
-                //qDebug("D: Trim %d, removed all %d samples from the digital data", signalTrim, s->size());
-                s->clear();
-            }
+            trimSignalData(s, -signalTrim, true);
         } else if (signalTrim > 0){
             // remove abs(signalTrim) samples from the end of the data
-            if (s->size() >= signalTrim) {
-                s->remove(s->size()-signalTrim-1, signalTrim);
-                //qDebug("D: Trim %d, removed %d samples from the end of the digital data", signalTrim, signalTrim);
-            } else {
-                //qDebug("D: Trim %d, removed all %d samples from the digital data", signalTrim, s->size());
-                s->clear();
-            }
+            trimSignalData(s, signalTrim, false);
         }
 
 
@@ -1052,24 +1095,15 @@ void LabToolCaptureDevice::convertAnalogInput(const quint8 *pData, quint32 size,
 
         if (mAnalogSignalData[id] == NULL) continue;
 
+        // Compensate for the delay in the analog hardware so that the analog and digital signals line up.
+        compensateForAnalogHardware(mAnalogSignalData[id], true);
+
         if (signalTrim < 0) {
             // remove abs(signalTrim) samples from the start of the data
-            if (mAnalogSignalData[id]->size() >= -signalTrim) {
-                mAnalogSignalData[id]->remove(0, -signalTrim);
-                //qDebug("A: Trim %d, removed %d samples from the start of the analog data", signalTrim, -signalTrim);
-            } else {
-                //qDebug("A: Trim %d, removed all %d samples from the analog data", signalTrim, mAnalogSignalData[id]->size());
-                mAnalogSignalData[id]->clear();
-            }
+            trimSignalData(mAnalogSignalData[id], -signalTrim, true);
         } else if (signalTrim > 0){
             // remove abs(signalTrim) samples from the end of the data
-            if (mAnalogSignalData[id]->size() >= signalTrim) {
-                mAnalogSignalData[id]->remove(mAnalogSignalData[id]->size()-signalTrim-1, signalTrim);
-                //qDebug("A: Trim %d, removed %d samples from the end of the analog data", signalTrim, -signalTrim);
-            } else {
-                //qDebug("A: Trim %d, removed all %d samples from the analog data", signalTrim, mAnalogSignalData[id]->size());
-                mAnalogSignalData[id]->clear();
-            }
+            trimSignalData(mAnalogSignalData[id], signalTrim, false);
         }
 
         // Deallocation:

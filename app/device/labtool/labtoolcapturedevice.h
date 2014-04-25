@@ -98,6 +98,12 @@ private:
 
     QTimer* mReconfigTimer;
 
+    template <typename T>
+    void trimSignalData(QVector<T> *s, int numToRemove, bool removeFromStart) const;
+
+    template <typename T>
+    void compensateForAnalogHardware(QVector<T> *s, bool isAnalogSignal) const;
+
     int locateFirstLevel(QVector<int> *s, int level, int offset);
     int locatePreviousLevel(QVector<int> *s, int level, int offset);
 
