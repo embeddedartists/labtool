@@ -158,9 +158,23 @@ RC_FILE = icon.rc
 INCLUDEPATH += .
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/libusbx/MinGW32/dll/ -lusb-1.0
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/libusbx/MinGW32/dll/ -lusb-1.0
+else:mac: LIBS += `/usr/local/bin/pkg-config libusb-1.0 --static --libs`
 else:unix:!symbian: LIBS += -L$$PWD/libusbx/Linux/ -lusb-1.0 -ludev
 
 INCLUDEPATH += $$PWD/libusbx/MS32/dll
 DEPENDPATH += $$PWD/libusbx/MS32/dll
 
 QT += widgets
+
+mac {
+    ICON = resources/oscilloscope.icns
+
+    FIRMWARE_BIN.files = ../firmware.bin
+    FIRMWARE_BIN.path = Contents/Resources
+    #DFU_UTIL.files = /usr/local/bin/dfu-util
+    DFU_UTIL.files = ../tools/dfu-util-0.7-binaries/darwin-universal/dfu-util
+    DFU_UTIL.path = Contents/MacOS
+    LIBUSB.files = ../tools/dfu-util-0.7-binaries/darwin-universal/libusb-1.0.0.dylib
+    LIBUSB.path = Contents/MacOS
+    QMAKE_BUNDLE_DATA += FIRMWARE_BIN DFU_UTIL LIBUSB
+}

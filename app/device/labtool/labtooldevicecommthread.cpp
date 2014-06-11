@@ -18,6 +18,7 @@
 #include <QFile>
 #include <QTime>
 #include <stdio.h>
+#include <QCoreApplication>
 
 /*!
     \class LabToolDeviceCommThread
@@ -136,7 +137,12 @@ void LabToolDeviceCommThread::reconnectToTarget()
 */
 void LabToolDeviceCommThread::prepareDfuImage()
 {
+#ifndef Q_OS_MACX
     QString fName = "../fw/firmware.bin";
+#else
+    QString appPath = QCoreApplication::applicationDirPath();
+    QString fName = appPath + "/../Resources/firmware.bin";
+#endif
 
     if (!QFile::exists(fName)) {
         fName = "firmware.bin";
@@ -196,6 +202,11 @@ void LabToolDeviceCommThread::runDFU()
         prepareDfuImage();
     }
 
+#ifdef Q_OS_MACX
+    QString appPath = QCoreApplication::applicationDirPath();
+    QString program = appPath + "/dfu-util";
+    qDebug("DFU program %s", qPrintable(program));
+#else
 #ifdef Q_OS_WIN
     QString program = "tools/dfu-util-0.7-binaries/win32-mingw32/dfu-util-static.exe";
 #else // Q_OS_LINUX
@@ -209,6 +220,7 @@ void LabToolDeviceCommThread::runDFU()
     {
         program = "../" + program;
     }
+#endif
     QStringList arguments;
     arguments << "-R" << "-d 1fc9:000c" << "-D" << mPreparedImage;
     //mDFUProcess->setWorkingDirectory("../tools/dfu-util-0.7-binaries/win32-mingw32/");

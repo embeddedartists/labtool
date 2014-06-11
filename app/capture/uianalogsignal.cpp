@@ -918,7 +918,7 @@ UiAnalogSignalPrivate* UiAnalogSignal::findSignal(QPoint pxPoint)
 
     if (mSignals.size() == 0) return NULL;
 
-    QPointF intersect[mSignals.size()];
+    QVector<QPointF> intersect(mSignals.size());
 
     double time = mTimeAxis->pixelToTimeRelativeRef(pxPoint.x());
 
@@ -994,7 +994,7 @@ void UiAnalogSignal::paintSignalValue(QPainter* painter, double time)
     QList<double> pk;
 
 
-    QPointF intersect[mSignals.size()];
+    QVector<QPointF> intersect(mSignals.size());
 
     for (int i = 0; i < mSignals.size(); i++) {
         UiAnalogSignalPrivate* p = mSignals.at(i);
