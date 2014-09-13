@@ -19,6 +19,7 @@
 #include <QTime>
 #include <stdio.h>
 #include <QCoreApplication>
+#include <QDebug>
 
 /*!
     \class LabToolDeviceCommThread
@@ -221,6 +222,14 @@ void LabToolDeviceCommThread::runDFU()
         program = "../" + program;
     }
 #endif
+    // Test that 'program' is executable before executing it to avoid zombie processes, see
+    // https://bugreports.qt-project.org/browse/QTBUG-5990
+    if (!(QFile::permissions(program) & QFile::ExeUser))
+    {
+        qCritical() << "Please change the permssion on \"" << program << "\" to make it executable";
+        return;
+    }
+
     QStringList arguments;
     arguments << "-R" << "-d 1fc9:000c" << "-D" << mPreparedImage;
     //mDFUProcess->setWorkingDirectory("../tools/dfu-util-0.7-binaries/win32-mingw32/");
