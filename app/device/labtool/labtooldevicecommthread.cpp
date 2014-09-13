@@ -139,14 +139,17 @@ void LabToolDeviceCommThread::reconnectToTarget()
 void LabToolDeviceCommThread::prepareDfuImage()
 {
 #ifndef Q_OS_MACX
-    QString fName = "../fw/firmware.bin";
+    QString fName = "fw/firmware.bin";
 #else
     QString appPath = QCoreApplication::applicationDirPath();
     QString fName = appPath + "/../Resources/firmware.bin";
 #endif
 
     if (!QFile::exists(fName)) {
-        fName = "firmware.bin";
+        fName = "../" + fName;
+        if (!QFile::exists(fName)) {
+            fName = "firmware.bin";
+        }
     }
 
     QFile fIn(fName);
