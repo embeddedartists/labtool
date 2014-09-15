@@ -25,3 +25,45 @@ fw/firmware.bin.qthdr
 
 # Misc unwanted files
 *.bak
+
+# C++ objects and libs
+*.slo
+*.lo
+*.a
+*.la
+*.lai
+*.so
+*.dll
+*.dylib
+
+# Qt-es
+
+/.qmake.cache
+/.qmake.stash
+*.pro.user
+*.pro.user.*
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+Makefile*
+*-build-*
+
+# QtCreator
+
+*.autosave
+
+#QtCtreator Qml
+*.qmlproject.user
+*.qmlproject.user.*
+
+# app executable
+app/LabTool
+app/LabTool.exe
+
+# VIM
+*.swp
+*.swo
+
+# gdb
+.gdb_history
