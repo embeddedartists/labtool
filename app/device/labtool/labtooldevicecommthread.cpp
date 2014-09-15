@@ -19,6 +19,7 @@
 #include <QTime>
 #include <stdio.h>
 #include <QCoreApplication>
+#include <QDebug>
 
 /*!
     \class LabToolDeviceCommThread
@@ -138,14 +139,17 @@ void LabToolDeviceCommThread::reconnectToTarget()
 void LabToolDeviceCommThread::prepareDfuImage()
 {
 #ifndef Q_OS_MACX
-    QString fName = "../fw/firmware.bin";
+    QString fName = "fw/firmware.bin";
 #else
     QString appPath = QCoreApplication::applicationDirPath();
     QString fName = appPath + "/../Resources/firmware.bin";
 #endif
 
     if (!QFile::exists(fName)) {
-        fName = "firmware.bin";
+        fName = "../" + fName;
+        if (!QFile::exists(fName)) {
+            fName = "firmware.bin";
+        }
     }
 
     QFile fIn(fName);
@@ -221,42 +225,55 @@ void LabToolDeviceCommThread::runDFU()
         program = "../" + program;
     }
 #endif
+    // Test that 'program' is executable before executing it to avoid zombie processes, see
+    // https://bugreports.qt-project.org/browse/QTBUG-5990
+    if (!(QFile::permissions(program) & QFile::ExeUser))
+    {
+        qCritical() << "Please change the permssion on \"" << program << "\" to make it executable";
+        return;
+    }
+
     QStringList arguments;
     arguments << "-R" << "-d 1fc9:000c" << "-D" << mPreparedImage;
-    //mDFUProcess->setWorkingDirectory("../tools/dfu-util-0.7-binaries/win32-mingw32/");
 
-    QProcess* m_DFUProcess = new QProcess();
-    m_DFUProcess->start(program, arguments);
-    if (m_DFUProcess->waitForFinished())
+    QProcess DFUProcess;
+    // DFUProcess.setWorkingDirectory("../tools/dfu-util-0.7-binaries/win32-mingw32/");
+    DFUProcess.start(program, arguments);
+    if (!DFUProcess.waitForStarted())
+    {
+        qDebug() << "DFU program \"" << program << "\" failed to start";
+        return;
+    }
+
+    if (DFUProcess.waitForFinished())
     {
 //        qDebug("DFU program finished");
 
-//        switch(m_DFUProcess->exitStatus()) {
+//        switch(DFUProcess.exitStatus()) {
 //        case QProcess::NormalExit: qDebug("exitStatus() = QProcess::NormalExit"); break;
 //        case QProcess::CrashExit:  qDebug("exitStatus() = QProcess::CrashExit"); break;
-//        default:                   qDebug("exitStatus() = unknown code %d", m_DFUProcess->exitStatus()); break;
+//        default:                   qDebug("exitStatus() = unknown code %d", DFUProcess.exitStatus()); break;
 //        }
 
-//        switch(m_DFUProcess->error()) {
+//        switch(DFUProcess.error()) {
 //        case QProcess::FailedToStart: qDebug("error() = QProcess::FailedToStart"); break;
 //        case QProcess::Crashed:       qDebug("error() = QProcess::Crashed"); break;
 //        case QProcess::Timedout:      qDebug("error() = QProcess::Timedout"); break;
 //        case QProcess::WriteError:    qDebug("error() = QProcess::WriteError"); break;
 //        case QProcess::ReadError:     qDebug("error() = QProcess::ReadError"); break;
 //        case QProcess::UnknownError:  qDebug("error() = QProcess::UnknownError"); break;
-//        default:                      qDebug("error() = unknown code %d", m_DFUProcess->error()); break;
+//        default:                      qDebug("error() = unknown code %d", DFUProcess.error()); break;
 //        }
 
-//        qDebug("exitCode() = %d", m_DFUProcess->exitCode());
+//        qDebug("exitCode() = %d", DFUProcess.exitCode());
 
-//        qDebug("readAllStandardError(): -->%s<--", m_DFUProcess->readAllStandardError().constData());
-//        qDebug("readAllStandardOutput(): -->%s<--", m_DFUProcess->readAllStandardOutput().constData());
+//        qDebug("readAllStandardError(): -->%s<--", DFUProcess.readAllStandardError().constData());
+//        qDebug("readAllStandardOutput(): -->%s<--", DFUProcess.readAllStandardOutput().constData());
     }
     else
     {
         qDebug("DFU program timed out waiting to finish");
     }
-    delete m_DFUProcess;
 }
 
 /*!
