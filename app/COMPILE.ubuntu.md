@@ -19,7 +19,7 @@ Now download the latest version of LabTool from github
     $ git clone https://github.com/embeddedartists/labtool.git
     $ cd ~/projects/labtool/app
 
-The newly installed libusb must also be made available to LabTool (source location may differ per distribution):
+The newly installed libusb must also be made available to LabTool (source location may differ per distribution and architecture):
 
     $ ln -s /usr/lib/x86_64-linux-gnu/libusb-1.0.a ~/projects/labtool/app/libusbx/Linux/
 
