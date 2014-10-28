@@ -53,7 +53,7 @@ If you would like to compile LabTool yourself, follow the instructions for that 
 
 Compiling in Linux
 ------------------
-Raspberry Pi is used as a reference system for Linux compilation. The instructions for building the LabTool User Interface on a Raspberry Pi are available [here](app/COMPILE.raspi.md).
+Raspberry Pi is used as a reference system for Linux compilation. The instructions for building the LabTool User Interface on a Raspberry Pi are available [here](app/COMPILE.raspi.md). Instructions for building on Ubuntu are available [here](app/COMPILE.ubuntu.md).
 
 If you use a different Linux distribution and/or hardware the Raspberry Pi instructions can give you a starting point.
 
