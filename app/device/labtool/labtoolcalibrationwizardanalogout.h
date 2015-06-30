@@ -18,6 +18,7 @@
 
 #include <QWizardPage>
 #include <QLabel>
+#include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QDoubleValidator>
 
@@ -27,15 +28,17 @@ class LabToolCalibrationWizardAnalogOut : public QWizardPage
 {
     Q_OBJECT
 public:
-    explicit LabToolCalibrationWizardAnalogOut(QWidget *parent = 0);
-
-    void setVisible(bool visible);
-
     enum Level {
         LOW    = 256,
         MIDDLE = 512,
         HIGH   = 768
     };
+
+    explicit LabToolCalibrationWizardAnalogOut(QWidget *parent = 0);
+
+    // QWizardPage interface
+    void setVisible(bool visible);
+    bool isComplete() const;
 
 protected:
     void initializePage();
@@ -54,17 +57,19 @@ private:
     QLabel *mLabel;
     QLabel *mLabelCurrentOutput;
 
-    QLineEdit *mLineEditLowA0;
-    QLineEdit *mLineEditMiddleA0;
-    QLineEdit *mLineEditHighA0;
+    QString mSpinnerSuffix;
 
-    QLineEdit *mLineEditLowA1;
-    QLineEdit *mLineEditMiddleA1;
-    QLineEdit *mLineEditHighA1;
+    QDoubleSpinBox *mSpinnerLowA0;
+    QDoubleSpinBox *mSpinnerMiddleA0;
+    QDoubleSpinBox *mSpinnerHighA0;
 
-    QDoubleValidator mValidator;
+    QDoubleSpinBox *mSpinnerLowA1;
+    QDoubleSpinBox *mSpinnerMiddleA1;
+    QDoubleSpinBox *mSpinnerHighA1;
 
     Level mCurrentLevel;
+    bool mOneValueCycle;
+
 };
 
 #endif // LABTOOLCALIBRATIONWIZARDANALOGOUT_H

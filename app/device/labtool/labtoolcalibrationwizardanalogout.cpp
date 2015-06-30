@@ -55,42 +55,74 @@ LabToolCalibrationWizardAnalogOut::LabToolCalibrationWizardAnalogOut(QWidget *pa
     QFormLayout* formLayoutA0 = new QFormLayout();
     QGroupBox* groupBoxA0 = new QGroupBox(tr("Settings for AOUT_0"));
 
-    mValidator.setRange(-5.0, 5.0, 5);
+    mSpinnerSuffix = " V";
 
-    mLineEditLowA0 = new QLineEdit();
-    mLineEditLowA0->setValidator(&mValidator);
-    registerField("a0LowLevel*", mLineEditLowA0);
-    formLayoutA0->addRow(tr("Low level (about 2.75V)"), mLineEditLowA0);
+    // all Spinners are deactivated by default. Will be activated row by row by
+    // nextValueClicked Slot.
+    mSpinnerLowA0 = new QDoubleSpinBox();
+    mSpinnerLowA0->setDecimals(2);
+    mSpinnerLowA0->setRange(2.5, 3.0);
+    mSpinnerLowA0->setValue(2.75);
+    mSpinnerLowA0->setSingleStep(0.01);
+    mSpinnerLowA0->setSuffix(mSpinnerSuffix);
+    mSpinnerLowA0->setDisabled(true);
+    registerField("a0LowLevel", mSpinnerLowA0, "value", "valueChanged");
+    formLayoutA0->addRow(tr("Low level (about 2.75V)"), mSpinnerLowA0);
 
-    mLineEditMiddleA0 = new QLineEdit();
-    mLineEditMiddleA0->setValidator(&mValidator);
-    registerField("a0MiddleLevel*", mLineEditMiddleA0);
-    formLayoutA0->addRow(tr("Middle level (about 0V)"), mLineEditMiddleA0);
+    mSpinnerMiddleA0 = new QDoubleSpinBox();
+    mSpinnerMiddleA0->setDecimals(2);
+    mSpinnerMiddleA0->setRange(-0.5, 0.5);
+    mSpinnerMiddleA0->setValue(0);
+    mSpinnerMiddleA0->setSingleStep(0.01);
+    mSpinnerMiddleA0->setSuffix(mSpinnerSuffix);
+    mSpinnerMiddleA0->setDisabled(true);
+    registerField("a0MiddleLevel", mSpinnerMiddleA0, "value", "valueChanged");
+    formLayoutA0->addRow(tr("Middle level (about 0V)"), mSpinnerMiddleA0);
 
-    mLineEditHighA0 = new QLineEdit();
-    mLineEditHighA0->setValidator(&mValidator);
-    registerField("a0HighLevel*", mLineEditHighA0);
-    formLayoutA0->addRow(tr("High level (about -2.75V)"), mLineEditHighA0);
+    mSpinnerHighA0 = new QDoubleSpinBox();
+    mSpinnerHighA0->setDecimals(2);
+    mSpinnerHighA0->setRange(-3.0, -2.5);
+    mSpinnerHighA0->setValue(-2.75);
+    mSpinnerHighA0->setSingleStep(0.01);
+    mSpinnerHighA0->setSuffix(mSpinnerSuffix);
+    mSpinnerHighA0->setDisabled(true);
+    registerField("a0HighLevel", mSpinnerHighA0, "value", "valueChanged");
+    formLayoutA0->addRow(tr("High level (about -2.75V)"), mSpinnerHighA0);
 
     groupBoxA0->setLayout(formLayoutA0);
 
     QFormLayout* formLayoutA1 = new QFormLayout();
     QGroupBox* groupBoxA1 = new QGroupBox(tr("Settings for AOUT_1"));
 
-    mLineEditLowA1 = new QLineEdit();
-    mLineEditLowA1->setValidator(&mValidator);
-    registerField("a1LowLevel*", mLineEditLowA1);
-    formLayoutA1->addRow(tr("Low level (about 2.75V)"), mLineEditLowA1);
+    mSpinnerLowA1 = new QDoubleSpinBox();
+    mSpinnerLowA1->setDecimals(2);
+    mSpinnerLowA1->setRange(2.5, 3.0);
+    mSpinnerLowA1->setValue(2.75);
+    mSpinnerLowA1->setSingleStep(0.01);
+    mSpinnerLowA1->setSuffix(mSpinnerSuffix);
+    mSpinnerLowA1->setDisabled(true);
+    registerField("a1LowLevel", mSpinnerLowA1, "value", "valueChanged");
+    formLayoutA1->addRow(tr("Low level (about 2.75V)"), mSpinnerLowA1);
 
-    mLineEditMiddleA1 = new QLineEdit();
-    mLineEditMiddleA1->setValidator(&mValidator);
-    registerField("a1MiddleLevel*", mLineEditMiddleA1);
-    formLayoutA1->addRow(tr("Middle level (about 0V)"), mLineEditMiddleA1);
+    mSpinnerMiddleA1 = new QDoubleSpinBox();
+    mSpinnerMiddleA1->setDecimals(2);
+    mSpinnerMiddleA1->setRange(-0.5, 0.5);
+    mSpinnerMiddleA1->setValue(0);
+    mSpinnerMiddleA1->setSingleStep(0.01);
+    mSpinnerMiddleA1->setSuffix(mSpinnerSuffix);
+    mSpinnerMiddleA1->setDisabled(true);
+    registerField("a1MiddleLevel", mSpinnerMiddleA1, "value", "valueChanged");
+    formLayoutA1->addRow(tr("Middle level (about 0V)"), mSpinnerMiddleA1);
 
-    mLineEditHighA1 = new QLineEdit();
-    mLineEditHighA1->setValidator(&mValidator);
-    registerField("a1HighLevel*", mLineEditHighA1);
-    formLayoutA1->addRow(tr("High level (about -2.75V)"), mLineEditHighA1);
+    mSpinnerHighA1 = new QDoubleSpinBox();
+    mSpinnerHighA1->setDecimals(2);
+    mSpinnerHighA1->setRange(-3.0, -2.5);
+    mSpinnerHighA1->setValue(-2.75);
+    mSpinnerHighA1->setSingleStep(0.01);
+    mSpinnerHighA1->setSuffix(mSpinnerSuffix);
+    mSpinnerHighA1->setDisabled(true);
+    registerField("a1HighLevel", mSpinnerHighA1, "value", "valueChanged");
+    formLayoutA1->addRow(tr("High level (about -2.75V)"), mSpinnerHighA1);
 
     groupBoxA1->setLayout(formLayoutA1);
 
@@ -107,6 +139,8 @@ LabToolCalibrationWizardAnalogOut::LabToolCalibrationWizardAnalogOut(QWidget *pa
     setLayout(layout);
 
     mCurrentLevel = HIGH;
+
+    mOneValueCycle = false;
 }
 
 /*!
@@ -148,6 +182,14 @@ void LabToolCalibrationWizardAnalogOut::setVisible(bool visible)
 }
 
 /*!
+ * \brief Validate the Next Button of the Wizard Page
+ */
+bool LabToolCalibrationWizardAnalogOut::isComplete() const
+{
+    return (mOneValueCycle == true) ? true : false;
+}
+
+/*!
     Overrides the QWizardPage::initializePage() function to fill in any default values.
 
     If any default values should be entered (e.g. the old calibrations
@@ -185,18 +227,41 @@ void LabToolCalibrationWizardAnalogOut::nextValueClicked()
     switch (mCurrentLevel)
     {
     case LOW:
+        mSpinnerMiddleA0->setDisabled(false);
+        mSpinnerMiddleA1->setDisabled(false);
+
+        mSpinnerLowA0->setDisabled(true);
+        mSpinnerLowA1->setDisabled(true);
+
         mCurrentLevel = MIDDLE;
         break;
     case MIDDLE:
+        mSpinnerHighA0->setDisabled(false);
+        mSpinnerHighA1->setDisabled(false);
+
+        mSpinnerMiddleA0->setDisabled(true);
+        mSpinnerMiddleA1->setDisabled(true);
+
+        mOneValueCycle = true;
         mCurrentLevel = HIGH;
         break;
     case HIGH:
-    default:
+        mSpinnerLowA0->setDisabled(false);
+        mSpinnerLowA1->setDisabled(false);
+
+        mSpinnerHighA0->setDisabled(true);
+        mSpinnerHighA1->setDisabled(true);
+
         mCurrentLevel = LOW;
+        break;
+    default:
         break;
     }
 
     comm->calibrateAnalogOut(mCurrentLevel);
+
+    if(mOneValueCycle)
+        emit completeChanged();
 }
 
 /*!
@@ -240,3 +305,4 @@ void LabToolCalibrationWizardAnalogOut::handleCalibrationSuccess(LabToolCalibrat
         break;
     }
 }
+
