@@ -24,6 +24,9 @@
 
 #include "labtooldevicecomm.h"
 
+#define SPINNER_DECIMALS 3
+#define SPINNER_SINGLE_STEP 0.001
+
 class LabToolCalibrationWizardAnalogOut : public QWizardPage
 {
     Q_OBJECT
