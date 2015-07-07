@@ -104,6 +104,8 @@ bool LabToolCalibrationWizardAnalogIn::isComplete() const
 */
 void LabToolCalibrationWizardAnalogIn::initializePage()
 {
+
+    // FIXME: Getting doubles from a QVariant might result in rounding errors.
     mA0[0] = field("a0LowLevel").toDouble();
     mA0[1] = field("a0MiddleLevel").toDouble();
     mA0[2] = field("a0HighLevel").toDouble();

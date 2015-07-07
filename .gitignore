@@ -4,6 +4,7 @@ LabTool.pro.user
 # Qt Shadow Build directories (different for Qt4 and Qt5)
 LabTool-build-desktop-Qt_4_*
 build-LabTool-Desktop_Qt_5_*
+build-LabTool-Desktop_Qt5*
 
 # uVision output
 fw/program/uVision/Internal_SRAM/
