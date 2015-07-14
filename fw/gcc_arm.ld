@@ -3,7 +3,7 @@
 /* Linker script to configure memory regions. */
 MEMORY
 {
-FLASH (rx) : ORIGIN = 0x10000000, LENGTH = 0x11000 /* 76k of RAM used as ROM */
+ROM (rx) : ORIGIN = 0x10000000, LENGTH = 0x11000 /* 76k of RAM used as ROM */
 RAM (rwx) : ORIGIN = 0x10011000, LENGTH = 0x07000  /* 20k of real RAM */
 }
 
@@ -65,18 +65,18 @@ KEEP(*(.fini))
 *(.rodata*)
 
 KEEP(*(.eh_frame*))
-} > FLASH
+} > ROM
 
 .ARM.extab : 
 {
 *(.ARM.extab* .gnu.linkonce.armextab.*)
-} > FLASH
+} > ROM
 
 __exidx_start = .;
 .ARM.exidx :
 {
 *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-} > FLASH
+} > ROM
 __exidx_end = .;
 
 __etext = .;
