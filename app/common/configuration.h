@@ -66,10 +66,6 @@ public:
     void loadLightScheme();
     void loadDarkScheme();
 
-signals:
-    
-public slots:
-
 private:
 
     explicit Configuration();
