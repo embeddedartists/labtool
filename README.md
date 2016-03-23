@@ -42,6 +42,8 @@ After booting into Raspbian open an LXTerminal and type in these commands:
     $ cd LabTool
     $ sudo cp 10-ea-labtool.rules /etc/udev/rules.d/
     $ cp LabTool.desktop ~/Desktop/
+    $ chmod +x LabTool
+    $ chmod +x tools/dfu-util-0.7-binaries/linux-armel/dfu-util
 
 Note that the exact name of the archive `labtool_raspi_2013-10-18.tgz` will change over time and the latest version is always available on the [product page][1].
 
