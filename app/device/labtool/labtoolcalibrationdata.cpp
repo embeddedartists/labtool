@@ -57,14 +57,14 @@ LabToolCalibrationData::LabToolCalibrationData(const quint8 *data)
 
             if (mReasonableData)
             {
-                if (!isfinite(mCalibA[ch][i]) || isnan(mCalibA[ch][i])) {
+                if (!std::isfinite(mCalibA[ch][i]) || std::isnan(mCalibA[ch][i])) {
                     mReasonableData = false;
                 }
                 else if ((mCalibA[ch][i] < -1000) || (mCalibA[ch][i] > 1000))
                 {
                     mReasonableData = false;
                 }
-                else if (!isfinite(mCalibB[ch][i]) || isnan(mCalibB[ch][i]))
+                else if (!std::isfinite(mCalibB[ch][i]) || std::isnan(mCalibB[ch][i]))
                 {
                     mReasonableData = false;
                 }
