@@ -57,14 +57,15 @@ LabToolCalibrationData::LabToolCalibrationData(const quint8 *data)
 
             if (mReasonableData)
             {
-                if (!std::isfinite(mCalibA[ch][i]) || std::isnan(mCalibA[ch][i])) {
+                if (isInfiniteOrNan(mCalibA[ch][i]))
+                {
                     mReasonableData = false;
                 }
                 else if ((mCalibA[ch][i] < -1000) || (mCalibA[ch][i] > 1000))
                 {
                     mReasonableData = false;
                 }
-                else if (!std::isfinite(mCalibB[ch][i]) || std::isnan(mCalibB[ch][i]))
+                else if (isInfiniteOrNan(mCalibA[ch][i]))
                 {
                     mReasonableData = false;
                 }
@@ -129,6 +130,23 @@ void LabToolCalibrationData::printCalibrationInfo()
     qDebug(" 2000mV  %10.7f %10.7f  %10.7f %10.7f", mCalibA[0][i], mCalibB[0][i], mCalibA[1][i], mCalibB[1][i]);i++;
     qDebug(" 5000mV  %10.7f %10.7f  %10.7f %10.7f", mCalibA[0][i], mCalibB[0][i], mCalibA[1][i], mCalibB[1][i]);i++;
 }
+
+bool LabToolCalibrationData::isInfiniteOrNan(double d)
+{
+    // Check whether the compiler is c++11 conformant.
+    // With c++11 the isfinite() and isnan() macros became functions.
+#if (__cplusplus == 201103L)
+    return !std::isfinite(d) || std::isnan(d);
+#else
+    return !isfinite(d) || isnan(d);
+#endif
+}
+
+/*!
+    \fn static bool LabToolCalibrationData::isInfiniteOrNan()
+
+    Returns true if \a d is INFINITE or NaN, false otherwise.
+*/
 
 /*!
     \fn static int LabToolCalibrationData::rawDataByteSize()

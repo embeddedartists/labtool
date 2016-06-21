@@ -48,6 +48,9 @@ private:
     calib_result mRawResult;
     bool mReasonableData;
 
+private:
+    static bool isInfiniteOrNan(double d);
+
 public:
     LabToolCalibrationData(const quint8* data);
 
