@@ -3,7 +3,7 @@ README file - dfu-util 0.7 binaries for win32
 SOURCE CODE:
 
 The sources for the libusbx library (here distributed as libusb-1.0.dll)
-can be found at http://libusbx.org/
+can be found at http://libusbx.info/
 
 The libusbx 1.0.14 release was patched with this bug fix:
 https://github.com/libusbx/libusbx/commit/09759d5836766fb3b886824cd669bc0dfc149d00
