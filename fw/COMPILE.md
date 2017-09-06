@@ -19,7 +19,7 @@ Compiling
 3. The firmware.bin file will be available in `./firmware.bin`
 
 
-[LPCXpresso IDE](http://www.lpcware.com/lpcxpresso/home):
+[LPCXpresso IDE](http://www.nxp.com/products/developer-resources/software-development-tools/software-tools/lpc-microcontroller-utilities/lpcxpresso-ide-v8.2.2:LPCXPRESSO):
 
 1. Start the LPCXpresso IDE and create a new workspace
 2. Select File->Import... to start the import dialog
@@ -29,6 +29,15 @@ Compiling
 6. Select Project->Build Project to compile
 7. The firmware.bin file will be available in `./firmware.bin`
 
+[MCUXpresso IDE](http://www.nxp.com/products/developer-resources/run-time-software/mcuxpresso-software-and-tools:MCUXPRESSO):
+
+1. Start the MCUXpresso IDE and create a new workspace
+2. Select File->Import... to start the import dialog
+3. Expand General and select Project from Folder or Archive. Press Next
+4. Enter the path to the `fw` folder in the Import source box. You may deselect fw\Lib_USB\LPCUSBLib folder. Press Finish
+5. Right click the `firmware` project from the Project Explorer side tab, and select Build Configurations->Set Active->Release
+6. Select Project->Build Project to compile
+7. The firmware.bin file will be available in `./firmware.bin`
 
 [GNU ARM GCC](https://launchpad.net/gcc-arm-embedded):
 
