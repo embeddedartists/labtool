@@ -325,7 +325,16 @@ void Configuration::setAnalogOutCableColor(int id, QColor &c)
 QColor Configuration::outsidePlotColor()
 {
     //return QColor(235, 235, 235);
-    return QColor(249, 249, 249);
+    //return QColor(249, 249, 249);
+
+    // Make outsidePlotColor() obey the color scheme while still providing some contrast.
+    // Note that the default black color is #000000, so .lighter(...) will effectively
+    // multiply with 0, which does nothing.
+    return mActiveColorScheme == COLOR_SCHEME_DARK ?
+                // workaround for .lighter(...)
+                QColor::fromHsv(mPlotBackgroundColor.hsvHue(), mPlotBackgroundColor.hsvSaturation(),
+                                mPlotBackgroundColor.value()+30) :
+                QColor(mPlotBackgroundColor).darker(105);
 }
 
 /*!

@@ -196,6 +196,11 @@ void UiPlot::paintEvent(QPaintEvent *event)
 
         painter.restore();
     }
+
+    // also update the palette
+    QPalette p = palette();
+    p.setColor(QPalette::Base, Configuration::instance().outsidePlotColor());
+    setPalette(p);
 }
 
 /*!
