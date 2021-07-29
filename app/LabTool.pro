@@ -1,4 +1,5 @@
 SOURCES += \
+    capture/uicapturestreamer.cpp \
     main.cpp \
     generator/i2cgenerator.cpp \
     device/devicemanager.cpp \
@@ -75,6 +76,7 @@ SOURCES += \
     device/reconfigurelistener.cpp
 
 HEADERS += \
+    capture/uicapturestreamer.h \
     generator/i2cgenerator.h \
     libusbx/include/libusbx-1.0/libusb.h \
     device/devicemanager.h \
@@ -164,7 +166,7 @@ else:unix:!symbian: LIBS += -L$$PWD/libusbx/Linux/ -lusb-1.0 -ludev
 INCLUDEPATH += $$PWD/libusbx/MS32/dll
 DEPENDPATH += $$PWD/libusbx/MS32/dll
 
-QT += widgets
+QT += widgets network
 
 mac {
     ICON = resources/oscilloscope.icns

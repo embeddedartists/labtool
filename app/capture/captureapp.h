@@ -24,6 +24,7 @@
 #include <QSettings>
 
 #include "uicapturearea.h"
+#include "uicapturestreamer.h"
 #include "device/device.h"
 
 class CaptureApp : public QObject
@@ -65,10 +66,14 @@ private:
     QAction* mTbStartAction;
     QAction* mTbContinuousAction;
     QAction* mTbStopAction;
+    QAction* mStreamAction;
 
     QComboBox* mRateBox;
 
     bool mCaptureActive;
+
+    bool mStreamingActive;
+    UiCaptureStreamer* captureStreamer;
 
     void createToolBar();
     void createMenu();
@@ -87,6 +92,7 @@ private slots:
     void calibrationSettings();
     void selectSignalsToAdd();
     void exportData();
+    void streamData();
     void sampleRateChanged(int rateIndex);
 
     

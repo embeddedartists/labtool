@@ -55,6 +55,7 @@ CaptureApp::CaptureApp(QWidget* uiContext, QObject *parent) :
     mUiContext = uiContext;
     mCaptureActive = false;
 
+
     mContinuous = false;
     // Deallocation: uiContext is set as parent
     mArea = new UiCaptureArea(mSignalManager, uiContext);
@@ -74,6 +75,10 @@ CaptureApp::CaptureApp(QWidget* uiContext, QObject *parent) :
                     this, SLOT(handleCaptureFinished(bool,QString)));
         }
     }
+
+
+    mStreamingActive = false;
+    captureStreamer = new UiCaptureStreamer(DeviceManager::instance().activeDevice()->captureDevice(), mUiContext);
 
 }
 
@@ -275,6 +280,8 @@ void CaptureApp::saveProject(QSettings &project)
 */
 void CaptureApp::handleDeviceChanged(Device* activeDevice)
 {
+    delete captureStreamer;
+    captureStreamer = new UiCaptureStreamer(activeDevice->captureDevice(), mUiContext);
     setupRates(activeDevice->captureDevice());
     mSignalManager->reloadSignalsFromDevice();
     mArea->updateAnalogGroup();
@@ -453,6 +460,19 @@ void CaptureApp::createMenu()
     action->setToolTip("Export captured signal data to file");
     connect(action, SIGNAL(triggered()), this, SLOT(exportData()));
     mMenu->addAction(action);
+
+
+    //
+    //    Set Up Socket
+    //
+
+    // Deallocation: "Qt Object trees" (See UiMainWindow)
+    mStreamAction = new QAction(tr("Stream Data to Socket"), this);
+    mStreamAction->setData("Stream Data to Socket");
+    mStreamAction->setToolTip("Open a socket and send the currently captured data there");
+    connect(mStreamAction, SIGNAL(triggered()), this, SLOT(streamData()));
+    mMenu->addAction(mStreamAction);
+
 
 }
 
@@ -744,6 +764,48 @@ void CaptureApp::exportData()
 
     UiCaptureExporter exporter(device, mUiContext);
     exporter.exec();
+
+}
+
+/*!
+    Called when the user selects to stream data to socket, adapted from exportData
+*/
+void CaptureApp::streamData()
+{
+    if(mStreamingActive) {
+        // currently streaming, so stop now
+        captureStreamer->stopStreaming();
+        mStreamingActive = false;
+        mStreamAction->setText(tr("Stream Data to Socket"));
+        mStreamAction->setData("Stream Data to Socket");
+
+    } else {
+        // currently not streaming, so (try to) start now
+
+        // checks before streaming
+        CaptureDevice* device = DeviceManager::instance().activeDevice()
+                ->captureDevice();
+        if (device == NULL) {
+            return;
+        }
+        // check if there is data to stream
+        if(device->digitalSignals().empty() && device->digitalSignals().empty()) {
+            QMessageBox::warning(mUiContext,
+                                 "No signal found",
+                                 "Please add at least one signal!");
+            return;
+        }
+
+
+        if(captureStreamer->exec() != QDialog::Accepted) {
+            // not accepted, abort
+            return;
+        }
+
+        mStreamingActive = true;
+        mStreamAction->setText(tr("Stop Streaming"));
+        mStreamAction->setData("Stop Streaming");
+    }
 
 }
 
