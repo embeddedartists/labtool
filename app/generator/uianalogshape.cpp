@@ -17,6 +17,7 @@
 
 #include <QDebug>
 #include <qmath.h>
+#include <QPainterPath>
 
 /*!
     \class UiAnalogShape
