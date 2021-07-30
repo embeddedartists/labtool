@@ -280,8 +280,14 @@ void CaptureApp::saveProject(QSettings &project)
 */
 void CaptureApp::handleDeviceChanged(Device* activeDevice)
 {
+    // recreate captureStreamer (even if not running)
     delete captureStreamer;
     captureStreamer = new UiCaptureStreamer(activeDevice->captureDevice(), mUiContext);
+    // update UI to follow up
+    // this will make it end up in the "stopped" UI state
+    mStreamingActive = true;
+    streamData();
+
     setupRates(activeDevice->captureDevice());
     mSignalManager->reloadSignalsFromDevice();
     mArea->updateAnalogGroup();
@@ -774,7 +780,7 @@ void CaptureApp::streamData()
 {
     if(mStreamingActive) {
         // currently streaming, so stop now
-        captureStreamer->stopStreaming();
+        emit captureStreamer->stopWorker();
         mStreamingActive = false;
         mStreamAction->setText(tr("Stream Data to Socket"));
         mStreamAction->setData("Stream Data to Socket");

@@ -1,4 +1,5 @@
 SOURCES += \
+    capture/streamworker.cpp \
     capture/uicapturestreamer.cpp \
     main.cpp \
     generator/i2cgenerator.cpp \
@@ -76,6 +77,7 @@ SOURCES += \
     device/reconfigurelistener.cpp
 
 HEADERS += \
+    capture/streamworker.h \
     capture/uicapturestreamer.h \
     generator/i2cgenerator.h \
     libusbx/include/libusbx-1.0/libusb.h \

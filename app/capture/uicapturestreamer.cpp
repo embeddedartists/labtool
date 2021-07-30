@@ -7,20 +7,12 @@
 
 
 /*!
-    \class UiCaptureStreamer
-    \brief This class is responsible for setting up and managing the data streaming.
-
-    \ingroup Capture
-
-*/
-
-/*!
     Dialog Window
 */
 UiCaptureStreamer::UiCaptureStreamer(CaptureDevice* device, QWidget *parent) :
     QDialog(parent)
 {
-    setWindowTitle(tr("Stream Data"));
+    setWindowTitle(tr("Stream"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     mCaptureDevice = device;
@@ -28,8 +20,10 @@ UiCaptureStreamer::UiCaptureStreamer(CaptureDevice* device, QWidget *parent) :
     // Deallocation: Ownership changed when calling setLayout.
     mMainLayout = new QVBoxLayout();
 
-    // Deallocation: Re-parented when calling mMainLayout->addLayout.
     QFormLayout* formLayout = new QFormLayout();
+
+    mMainLayout->addWidget(new QLabel(tr("Stream data over TCP as JSON"), this));
+    mMainLayout->addWidget(new QLabel(tr("Every message is in a new line"), this));
 
     // Deallocation: "Qt Object trees" (See UiMainWindow)
     mPortSpinBox = new QSpinBox(this);
@@ -42,7 +36,7 @@ UiCaptureStreamer::UiCaptureStreamer(CaptureDevice* device, QWidget *parent) :
 
     // Deallocation: "Qt Object trees" (See UiMainWindow)
     QPushButton* streamBtn = new QPushButton("Stream", this);
-    connect(streamBtn, SIGNAL(clicked()), this, SLOT(streamData()));
+    connect(streamBtn, SIGNAL(clicked()), this, SLOT(handleStreamBtnPressed()));
 
     QPushButton* cancelBtn = new QPushButton("Cancel", this);
     connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
@@ -59,198 +53,69 @@ UiCaptureStreamer::UiCaptureStreamer(CaptureDevice* device, QWidget *parent) :
     setLayout(mMainLayout);
 
     // set up and connect StreamWorker
-    streamWorker.moveToThread(&workerThread);
-    streamWorker.setCaptureDevice(device);
-    connect(this, &UiCaptureStreamer::start, &streamWorker, &StreamWorker::start);
-    connect(this, &UiCaptureStreamer::stop, &streamWorker, &StreamWorker::stop);
-    connect(device, &CaptureDevice::captureFinished, &streamWorker, &StreamWorker::handleCaptureFinished);
+    streamWorker = new StreamWorker(device);
+    workerThread = new QThread();
+    streamWorker->moveToThread(workerThread);
+    connect(this, &UiCaptureStreamer::startWorker, streamWorker, &StreamWorker::start);
+    connect(this, &UiCaptureStreamer::stopWorker, streamWorker, &StreamWorker::stop);
+    connect(streamWorker, &StreamWorker::running, this, &UiCaptureStreamer::handleStreamRunning);
+    connect(streamWorker, &StreamWorker::error, this, &UiCaptureStreamer::handleStreamError);
+    connect(device, &CaptureDevice::captureFinished, streamWorker, &StreamWorker::handleCaptureFinished);
+    // make sure to properly set up deletion across threads
+    connect(this, &UiCaptureStreamer::destroyWorker, streamWorker, &StreamWorker::deleteLater);
+    connect(streamWorker, &StreamWorker::deleted, workerThread, &QThread::deleteLater);
 
 }
 
 /*!
-    Called when the user clicks the Stream button.
+Destructor that takes care of stopping the thread etc.
 */
-void UiCaptureStreamer::streamData()
+UiCaptureStreamer::~UiCaptureStreamer()
+{
+    // this stops the worker and then frees its resources
+    // then the worker will detele its thread via signals
+    emit destroyWorker();
+
+}
+
+/*!
+Called when the user clicks the Stream button.
+*/
+void UiCaptureStreamer::handleStreamBtnPressed()
 {
     // check if the worker is in the right state
-    if(streamWorker.getState() != StreamWorker::STOPPED) {
+    if(streamWorker->getState() != StreamWorker::STOPPED) {
         reject();
         return;
     }
 
     // start thread if necessary
-    if(!workerThread.isRunning()) {
-        workerThread.start();
+    if(!workerThread->isRunning()) {
+        workerThread->start();
     }
 
-    emit start(mPortSpinBox->value());
+    emit startWorker(mPortSpinBox->value());
 
-    // check if Worker is done initializing or timeout, a bit ugly
-    for (int i = 0; i < 50 && streamWorker.getState() == StreamWorker::STOPPED; i++) {
-        streamWorker.stateChangingMutex.tryLock(100);
-    }
-    if(streamWorker.getState() == StreamWorker::STOPPED) {
-        QMessageBox::warning(this,
-                             "Stream Error",
-                             "Timeout when setting up server, aborting");
-        // for good measure, try to close the server again
-        emit stop();
-        reject();
-        return;
-    }
-    if(streamWorker.getState() == StreamWorker::ERROR) {
-        QMessageBox::warning(this,
-                             "Stream Error",
-                             "Failed to set up server, check port!");
-        // this sets the state back to stopped
-        emit stop();
-        reject();
-        return;
-    }
+    // the answer is handled by handleStreamWorkerRunning/Error
+}
 
+/*!
+This will get called after the start request and a successful start
+*/
+void UiCaptureStreamer::handleStreamRunning() {
+    // just accept the dialog, everything went well
     accept();
 }
 
 /*!
-    Waits until the streaming is stopped
+This will get called after the start request and an error
 */
-void UiCaptureStreamer::stopStreaming() {
-    emit stop();
-    while(streamWorker.getState() != StreamWorker::STOPPED) {
-        streamWorker.stateChangingMutex.tryLock(1000);
-    }
+void UiCaptureStreamer::handleStreamError() {
+    QMessageBox::warning(this,
+                         "Stream Error",
+                         "Failed to set up server, check port!");
+    // this sets the state back to stopped
+    emit stopWorker();
+    reject();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// StreamWorker Implementation below
-///////////////////////////////////////////////////////////////////////////////
-
-/*!
- * Start streaming (start listening)
- */
-void StreamWorker::start(int port) {
-    if(port < 1 || port > 65535) {
-        // bad port value
-        state = StreamingState::ERROR;
-        return;
-    }
-
-    if(state != StreamingState::STOPPED) {
-        // we are not in the right state, stop and indicate an error
-        stop();
-        state = StreamingState::ERROR;
-        return;
-    }
-
-    if (server == nullptr) {
-        server = new QTcpServer();
-    }
-
-    if(!server->listen(QHostAddress::Any, port)) {
-        // error with the port
-        state = StreamingState::ERROR;
-        server->close();
-        return;
-    }
-
-    connect(server, &QTcpServer::newConnection, this, &StreamWorker::handleNewConnection);
-    qInfo() << "StreamWorker: Starting";
-    state = StreamingState::RUNNING;
-}
-
-/*!
- * Stop streaming
- */
-void StreamWorker::stop() {
-    qInfo() << "StreamWorker: Stopping";
-    if(state == StreamingState::RUNNING) {
-        server->close();
-        sockets.clear();
-    }
-    state = StreamingState::STOPPED;
-}
-
-/*!
-    Handle a new connection by adding it to the list and remove it when disconnected
-    \todo check if this works
-*/
-void StreamWorker::handleNewConnection() {
-    QTcpSocket* socket = server->nextPendingConnection();
-    if(socket == nullptr) {
-        // I have no idea why this would happen, but it happens
-        return;
-    }
-    sockets.append(socket);
-    qInfo() << "StreamWorker: Got new connection";
-    connect(socket, &QTcpSocket::disconnected, [this, socket](){
-        this->sockets.removeOne(socket);
-    //  delete socket;
-    //  maybe there is a memory leak here, but with the delete, it will crash
-    } );
-}
-
-/*!
-    Send the captured data to all active sockets
-    \todo check if this works
-*/
-void StreamWorker::handleCaptureFinished(bool successful, QString msg) {
-    qDebug() << "StreamWorker: Got new data, sending to " << sockets.length() << " clients";
-    if(state == StreamingState::RUNNING && successful) {
-        QJsonObject json;
-        this->writeToJson(json);
-        // write compact json, so one message -> one line
-        // this simplifies reading in clients with tcp streaming
-        // so the delimiter between messages will be '\n'
-        QByteArray jsonBytes = QJsonDocument(json).toJson(QJsonDocument::Compact);
-        foreach(QTcpSocket* socket, sockets) {
-            socket->write(jsonBytes);
-            socket->write("\n");
-        }
-    }
-}
-
-/*!
-    Writes the current state of the CaptureDevice to JSON
- */
-void StreamWorker::writeToJson(QJsonObject &json) {
-    QJsonArray jsonSignals;
-
-    QList<DigitalSignal*> digitalSignals = device->digitalSignals();
-    QList<AnalogSignal*> analogSignals = device->analogSignals();
-
-    json.insert("sampleRate", device->usedSampleRate());
-
-    foreach(DigitalSignal* s, digitalSignals) {
-        QVector<int>* data = device->digitalData(s->id());
-        if (data == NULL) continue;
-
-        QJsonObject jsonSignal;
-        jsonSignal.insert("id", s->id());
-        jsonSignal.insert("name", s->name());
-        jsonSignal.insert("type", "digital");
-        QJsonArray jsonData;
-        foreach(int dataPoint, *data) {
-            jsonData.append(dataPoint);
-        }
-        jsonSignal.insert("data", jsonData);
-        jsonSignals.append(jsonSignal);
-    }
-    foreach(AnalogSignal* s, analogSignals) {
-        QVector<double>* data = device->analogData(s->id());
-        if (data == NULL) continue;
-
-        QJsonObject jsonSignal;
-        jsonSignal.insert("id", s->id());
-        jsonSignal.insert("name", s->name());
-        jsonSignal.insert("type", "analog");
-        QJsonArray jsonData;
-        foreach(double dataPoint, *data) {
-            jsonData.append(dataPoint);
-        }
-        jsonSignal.insert("data", jsonData);
-        jsonSignals.append(jsonSignal);
-    }
-
-    json.insert("signals", jsonSignals);
-
-}
