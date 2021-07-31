@@ -469,10 +469,9 @@ void CaptureApp::createMenu()
 
 
     //
-    //    Set Up Socket
+    //    Set Up Streaming via Network
     //
 
-    // Deallocation: "Qt Object trees" (See UiMainWindow)
     mStreamAction = new QAction(tr("Stream Data to Socket"), this);
     mStreamAction->setData("Stream Data to Socket");
     mStreamAction->setToolTip("Open a socket and send the currently captured data there");
@@ -795,7 +794,7 @@ void CaptureApp::streamData()
             return;
         }
         // check if there is data to stream
-        if(device->digitalSignals().empty() && device->digitalSignals().empty()) {
+        if(device->digitalSignals().empty() && device->analogSignals().empty()) {
             QMessageBox::warning(mUiContext,
                                  "No signal found",
                                  "Please add at least one signal!");
